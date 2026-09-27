@@ -1,0 +1,1853 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>GGsell</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root {
+    --bg: #f2f2f7; --card: #ffffff; --text: #1c1c1e; --text2: #8e8e93;
+    --green: #34c759; --green-light: #e5f5e9; --red: #ff3b30; --red-light: #ffe5e5;
+    --yellow: #ffcc00; --orange: #ff9500; --purple: #af52de; --purple-light: #f3e8fd;
+    --blue: #007aff; --blue-light: #e5f0ff; --radius: 16px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg); margin: 0; padding: 0; color: var(--text);
+    padding-bottom: 100px; overflow-x: hidden; }
+.container { padding: 16px; max-width: 500px; margin: 0 auto; }
+.icon { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.8;
+    stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+.icon-lg { width: 24px; height: 24px; } .icon-sm { width: 16px; height: 16px; }
+.header { display: flex; justify-content: space-between; align-items: center; padding: 12px 0 20px 0; }
+.logo { font-size: 24px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+.logo-icon { width: 32px; height: 32px; background: var(--green); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 18px; }
+.help-btn { width: 36px; height: 36px; border-radius: 50%; background: #fff; border: none;
+    box-shadow: var(--shadow); display: flex; align-items: center; justify-content: center;
+    color: var(--text2); cursor: pointer; }
+.section-title { font-size: 16px; font-weight: 700; margin: 20px 0 12px 0;
+    display: flex; justify-content: space-between; align-items: center; }
+.section-title .link { color: var(--green); font-size: 14px; font-weight: 600; cursor: pointer; }
+.section-title .count-badge { background: var(--green-light); color: var(--green);
+    font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 10px; margin-left: 6px; }
+.banner { background: #1a1e26; border-radius: var(--radius); padding: 20px;
+    position: relative; overflow: hidden; color: white; margin-bottom: 20px; }
+.banner-badge { display: inline-block; background: var(--green); color: white;
+    font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px;
+    margin-bottom: 12px; text-transform: uppercase; }
+.banner h1 { font-size: 22px; margin: 0 0 8px 0; line-height: 1.2; }
+.banner p { font-size: 13px; color: #a0a0a5; margin: 0 0 16px 0; line-height: 1.4; }
+.banner-btn { background: white; color: #1a1e26; border: none; padding: 10px 20px;
+    border-radius: 30px; font-weight: 600; font-size: 14px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 8px; }
+.banner-bg-logo { position: absolute; right: -20px; bottom: -20px; font-size: 140px;
+    font-weight: 900; color: rgba(52, 199, 89, 0.15); line-height: 1; pointer-events: none; }
+.quick-actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+.action-card { background: var(--card); border-radius: var(--radius); padding: 16px 10px;
+    text-align: center; box-shadow: var(--shadow); cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 8px; transition: transform 0.1s; }
+.action-card:active { transform: scale(0.97); }
+.action-icon { width: 40px; height: 40px; background: #f2f2f7; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; color: var(--text); }
+.action-text { font-size: 12px; font-weight: 600; line-height: 1.2; }
+.balance-card { background: var(--card); border-radius: var(--radius); padding: 20px;
+    box-shadow: var(--shadow); margin-bottom: 16px; }
+.balance-label { font-size: 13px; color: var(--text2); margin-bottom: 6px; }
+.balance-amount { font-size: 32px; font-weight: 800; margin-bottom: 16px;
+    display: flex; align-items: baseline; gap: 6px; }
+.currency-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.currency-tag { background: #f2f2f7; color: var(--text2); padding: 6px 14px;
+    border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: all 0.2s; user-select: none; }
+.currency-tag.active { background: var(--green); color: white; }
+.profile-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+.stat-card { background: var(--card); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); }
+.stat-value { font-size: 24px; font-weight: 800; margin-bottom: 4px;
+    display: flex; align-items: center; gap: 4px; }
+.stat-label { font-size: 12px; color: var(--text2); }
+.menu-list { background: var(--card); border-radius: var(--radius);
+    box-shadow: var(--shadow); overflow: hidden; margin-bottom: 20px; }
+.menu-item { display: flex; align-items: center; padding: 16px;
+    border-bottom: 1px solid #f2f2f7; cursor: pointer; transition: background 0.2s; }
+.menu-item:last-child { border-bottom: none; }
+.menu-item:active { background: #f9f9f9; }
+.menu-icon { width: 40px; height: 40px; background: #f2f2f7; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    margin-right: 14px; flex-shrink: 0; color: var(--text); }
+.menu-text { flex-grow: 1; font-size: 15px; font-weight: 500; }
+.menu-arrow { color: #c7c7cc; }
+.menu-item.danger .menu-text { color: var(--red); }
+.menu-item.danger .menu-icon { background: var(--red-light); color: var(--red); }
+.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0;
+    background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px); border-top: 1px solid #e5e5ea;
+    display: flex; justify-content: space-around; padding: 8px 0 20px 0;
+    z-index: 100; max-width: 500px; margin: 0 auto; }
+.nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px;
+    color: var(--text2); font-size: 10px; font-weight: 500; cursor: pointer;
+    flex: 1; padding: 6px 0; }
+.nav-item.active { color: var(--green); }
+.nav-icon { display: flex; align-items: center; justify-content: center; }
+.fab { position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%);
+    width: 56px; height: 56px; background: var(--green); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; color: white;
+    box-shadow: 0 4px 12px rgba(52,199,89,0.4); cursor: pointer; z-index: 101;
+    transition: transform 0.1s; border: 4px solid var(--bg); }
+.fab:active { transform: translateX(-50%) scale(0.95); }
+.screen { display: none; animation: fadeIn 0.2s ease-in-out; }
+.screen.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+.review-card { background: var(--card); border-radius: var(--radius); padding: 16px;
+    margin-bottom: 10px; box-shadow: var(--shadow); }
+.review-header { display: flex; align-items: center; margin-bottom: 8px; }
+.avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--green-light);
+    color: var(--green); display: flex; align-items: center; justify-content: center;
+    font-weight: bold; font-size: 16px; margin-right: 12px; flex-shrink: 0; }
+.user-info { flex-grow: 1; }
+.username { font-weight: 600; font-size: 14px; margin: 0; }
+.date { font-size: 11px; color: var(--text2); margin-top: 2px; }
+.stars { color: var(--yellow); display: flex; gap: 1px; }
+.review-text { font-size: 13px; line-height: 1.4; color: #3a3a3c; margin: 0; }
+.req-card { background: var(--card); border-radius: var(--radius); padding: 16px;
+    box-shadow: var(--shadow); margin-bottom: 10px; display: flex;
+    align-items: center; justify-content: space-between; cursor: pointer; }
+.req-left { display: flex; align-items: center; gap: 12px; }
+.req-icon { width: 40px; height: 40px; background: #f2f2f7; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; color: var(--text); }
+.req-title { font-size: 15px; font-weight: 600; }
+.req-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.form-group { margin-bottom: 16px; }
+.form-label { font-size: 13px; font-weight: 600; color: var(--text2); margin-bottom: 8px; display: block; }
+.role-switch { display: flex; background: #f2f2f7; border-radius: 30px; padding: 4px; }
+.role-btn { flex: 1; text-align: center; padding: 10px; border-radius: 26px;
+    font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.role-btn.active { background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.form-input, .form-textarea { width: 100%; padding: 14px; border-radius: 12px;
+    border: 1px solid #e5e5ea; font-size: 16px; background: white; outline: none; font-family: inherit; }
+.form-input:focus, .form-textarea:focus { border-color: var(--green); }
+.form-textarea { min-height: 80px; resize: vertical; font-size: 14px; }
+.btn-primary { width: 100%; background: var(--green); color: white; border: none;
+    padding: 16px; border-radius: 30px; font-size: 16px; font-weight: 700;
+    cursor: pointer; box-shadow: 0 4px 12px rgba(52,199,89,0.3);
+    margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-primary:active { transform: scale(0.98); }
+.btn-secondary { width: 100%; background: #f2f2f7; color: var(--text); border: none;
+    padding: 16px; border-radius: 30px; font-size: 16px; font-weight: 600;
+    cursor: pointer; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.empty-state { background: var(--card); border-radius: var(--radius); padding: 40px 20px;
+    text-align: center; border: 2px dashed #e5e5ea; margin-bottom: 20px; }
+.empty-icon { margin-bottom: 12px; color: #c7c7cc; display: flex; justify-content: center; }
+.empty-text { color: var(--text2); font-size: 14px; }
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+    z-index: 1000; display: none; align-items: flex-end; justify-content: center; }
+.modal.active { display: flex; }
+.modal-content { background: var(--bg); width: 100%; max-width: 500px;
+    border-radius: 24px 24px 0 0; padding: 20px; max-height: 92vh; overflow-y: auto;
+    animation: slideUp 0.3s ease-out; }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.modal-title { font-size: 20px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+.badge { background: var(--green-light); color: var(--green);
+    font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
+.close-btn { width: 32px; height: 32px; border-radius: 50%; background: #f2f2f7;
+    border: none; display: flex; align-items: center; justify-content: center;
+    color: var(--text2); cursor: pointer; }
+.tabs { display: flex; background: #e5e5ea; border-radius: 30px; padding: 4px; margin-bottom: 20px; }
+.tab { flex: 1; text-align: center; padding: 10px; border-radius: 26px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px; }
+.tab.active { background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.tab-section { display: none; } .tab-section.active { display: block; }
+.field { margin-bottom: 14px; }
+.field label { font-size: 13px; font-weight: 600; color: var(--text2);
+    margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+.field input, .field textarea { width: 100%; padding: 12px 14px; border-radius: 12px;
+    border: 1px solid #e5e5ea; font-size: 16px; background: white; outline: none; font-family: inherit; }
+.field textarea { min-height: 80px; resize: vertical; font-size: 14px; }
+.worker-access-btn { display: none;
+    background: linear-gradient(135deg, #1a1e26 0%, #2c3e50 100%);
+    color: white; border: none; border-radius: var(--radius);
+    padding: 16px; width: 100%; font-size: 15px; font-weight: 700;
+    cursor: pointer; margin-bottom: 20px;
+    align-items: center; justify-content: center; gap: 10px; }
+.worker-access-btn.visible { display: flex; }
+.deal-item { background: var(--card); border-radius: var(--radius); padding: 16px;
+    box-shadow: var(--shadow); margin-bottom: 10px; cursor: pointer; }
+.deal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.deal-id { font-size: 14px; font-weight: 700; }
+.deal-status { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
+.status-wait { background: #fff7e5; color: #ff9500; }
+.status-active { background: var(--green-light); color: var(--green); }
+.status-purple { background: var(--purple-light); color: var(--purple); }
+.status-done { background: #e5e5ea; color: var(--text2); }
+.deal-amount { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+.deal-link { font-size: 12px; color: var(--text2); margin-bottom: 8px; word-break: break-all; }
+.deal-time { font-size: 11px; color: var(--text2); background: #f2f2f7;
+    padding: 2px 8px; border-radius: 10px; display: inline-block; margin-bottom: 10px; }
+.deal-progress { display: flex; align-items: center; gap: 4px; margin-top: 8px; }
+.progress-dot { width: 10px; height: 10px; border-radius: 50%; background: #e5e5ea; flex-shrink: 0; }
+.progress-dot.active { background: var(--green); box-shadow: 0 0 0 2px rgba(52,199,89,0.2); }
+.progress-dot.current { background: white; border: 2px solid var(--green); }
+.progress-line { flex: 1; height: 3px; background: #e5e5ea; border-radius: 2px; }
+.progress-line.active { background: var(--green); }
+.deal-detail-id { font-size: 22px; font-weight: 800; }
+.status-badge { font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 20px; }
+.status-step { background: #f2f2f7; border-radius: var(--radius); padding: 16px;
+    text-align: center; margin-bottom: 16px; }
+.status-step-label { font-size: 11px; color: var(--text2); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+.status-step-title { font-size: 16px; font-weight: 700; margin: 4px 0 12px 0; }
+.status-steps { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.step-item { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+.step-dot { width: 20px; height: 20px; border-radius: 50%; background: #e5e5ea; border: 2px solid #e5e5ea; }
+.step-dot.active { background: var(--green); border-color: var(--green); box-shadow: 0 0 0 3px rgba(52,199,89,0.2); }
+.step-dot.current { background: white; border-color: var(--green); box-shadow: 0 0 0 3px rgba(52,199,89,0.2); }
+.step-label { font-size: 9px; color: var(--text2); font-weight: 600; text-align: center; }
+.step-label.active { color: var(--green); }
+.step-secure { font-size: 11px; color: var(--text2); display: flex; align-items: center;
+    justify-content: center; gap: 4px; margin-top: 8px; }
+.deal-info-card { background: var(--card); border-radius: var(--radius); padding: 16px;
+    box-shadow: var(--shadow); margin-bottom: 16px; }
+.deal-info-row { display: flex; justify-content: space-between; padding: 10px 0;
+    border-bottom: 1px solid #f2f2f7; font-size: 14px; }
+.deal-info-row:last-child { border-bottom: none; }
+.deal-info-row .label { color: var(--text2); }
+.deal-info-row .value { font-weight: 600; text-align: right; }
+.deal-info-row .value.green { color: var(--green); }
+.deal-hint { background: #fff7e5; border-radius: var(--radius); padding: 16px;
+    margin-bottom: 16px; font-size: 13px; color: #8a6d00; line-height: 1.4; }
+.deal-hint strong { color: #6b5500; display: block; margin-bottom: 6px; font-size: 12px; letter-spacing: 0.5px; }
+.deal-hint.blue { background: var(--blue-light); color: #004a99; }
+.deal-hint.blue strong { color: #003366; }
+.deal-hint.purple { background: var(--purple-light); color: #5e2b8a; }
+.deal-hint.purple strong { color: #4a1f70; }
+.safety-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+    z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; }
+.safety-modal.active { display: flex; }
+.safety-content { background: white; border-radius: 24px; padding: 24px;
+    max-width: 400px; width: 100%; animation: scaleIn 0.3s ease-out;
+    max-height: 90vh; overflow-y: auto; }
+@keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.safety-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.safety-icon { width: 40px; height: 40px; background: var(--red-light); border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; color: var(--red); }
+.safety-title { font-size: 18px; font-weight: 800; margin: 0; }
+.safety-sub { font-size: 12px; color: var(--text2); margin: 2px 0 0 0; }
+.safety-warning { background: #fff7e5; border: 1px solid #ffe5a5; border-radius: 12px;
+    padding: 12px; margin-bottom: 14px; font-size: 13px; color: #8a6d00; line-height: 1.4; }
+.safety-warning strong { display: block; margin-bottom: 4px; }
+.safety-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; font-size: 14px; }
+.safety-row .check { width: 28px; height: 28px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.safety-row .check.green { background: var(--green-light); color: var(--green); }
+.safety-row .check.red { background: var(--red-light); color: var(--red); }
+.safety-row .check.yellow { background: #fff7e5; color: var(--orange); }
+.safety-danger { background: #fff0f0; border: 1px solid #ffcccc; border-radius: 12px;
+    padding: 12px; margin-top: 14px; font-size: 12px; color: var(--red);
+    font-weight: 600; text-align: center; }
+.safety-danger-tags { display: flex; justify-content: center; gap: 8px; margin-top: 8px; }
+.safety-danger-tags span { background: white; border: 1px solid #ffcccc; padding: 4px 10px;
+    border-radius: 20px; font-size: 11px; color: var(--red); }
+.manager-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+    z-index: 2500; display: none; align-items: center; justify-content: center; padding: 20px; }
+.manager-modal.active { display: flex; }
+.manager-content { background: white; border-radius: 24px; padding: 24px;
+    max-width: 400px; width: 100%; animation: scaleIn 0.3s ease-out; }
+.manager-title { font-size: 20px; font-weight: 800; text-align: center; margin-bottom: 12px; }
+.manager-sub { font-size: 16px; font-weight: 700; text-align: center; margin-bottom: 8px; }
+.manager-info { font-size: 13px; color: var(--text2); text-align: center; margin-bottom: 16px; }
+.manager-warning { background: #fff0f0; border: 1px solid #ffcccc; border-radius: 12px;
+    padding: 12px; margin-bottom: 16px; font-size: 13px; color: var(--red); line-height: 1.4; }
+.share-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+    z-index: 2200; display: none; align-items: center; justify-content: center; padding: 20px; }
+.share-modal.active { display: flex; }
+.share-content { background: white; border-radius: 24px; padding: 20px;
+    max-width: 420px; width: 100%; animation: scaleIn 0.3s ease-out;
+    max-height: 90vh; overflow-y: auto; }
+.share-text-block { background: #f2f2f7; border-radius: 12px; padding: 14px;
+    font-size: 13px; line-height: 1.5; margin-bottom: 16px; color: #1c1c1e; }
+.share-text-block .line { background: white; border-radius: 8px; padding: 8px 12px;
+    margin-bottom: 6px; border-left: 3px solid var(--green); }
+
+.reviews-scroll { max-height: 520px; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-right: 4px; }
+.reviews-scroll::-webkit-scrollbar { width: 4px; }
+.reviews-scroll::-webkit-scrollbar-thumb { background: #c7c7cc; border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<div id="screen-home" class="screen active">
+<div class="container">
+    <div class="header">
+        <div class="logo"><div class="logo-icon">G</div>ggsel</div>
+        <button class="help-btn" onclick="alert('Помощь')">
+            <svg class="icon icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </button>
+    </div>
+
+    <button class="worker-access-btn" id="workerAccessBtn" onclick="openWorkerPanel()">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        Открыть Ворк-панель
+    </button>
+
+    <div class="banner">
+        <div class="banner-badge">Безопасные сделки</div>
+        <h1>P2P-гарант в Telegram</h1>
+        <p>Деньги резервируются до успешного завершения сделки.</p>
+        <button class="banner-btn" onclick="switchTab('new-deal')">
+            Создать сделку
+            <svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+        <div class="banner-bg-logo">G</div>
+    </div>
+
+    <div class="section-title">Быстрые действия</div>
+    <div class="quick-actions">
+        <div class="action-card" onclick="switchTab('new-deal')">
+            <div class="action-icon"><svg class="icon icon-lg" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+            <div class="action-text">Новая сделка</div>
+        </div>
+        <div class="action-card" onclick="openJoinDeal()">
+            <div class="action-icon"><svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
+            <div class="action-text">Вступить в сделку</div>
+        </div>
+        <div class="action-card" onclick="switchTab('deals')">
+            <div class="action-icon"><svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 12L2 9z"/><path d="M11 3L8 9l4 12 4-12-3-6"/><line x1="2" y1="9" x2="22" y2="9"/></svg></div>
+            <div class="action-text">Мои сделки</div>
+        </div>
+    </div>
+
+    <div class="balance-card">
+        <div class="balance-label">Ваш баланс</div>
+        <div class="balance-amount" id="homeBalance">0 ₽</div>
+        <div class="currency-tags" id="homeCurrencyTags">
+            <div class="currency-tag active" data-curr="RUB">RUB</div>
+            <div class="currency-tag" data-curr="UAH">UAH</div>
+            <div class="currency-tag" data-curr="KZT">KZT</div>
+            <div class="currency-tag" data-curr="UZS">UZS</div>
+            <div class="currency-tag" data-curr="TON">TON</div>
+            <div class="currency-tag" data-curr="USDT">USDT</div>
+            <div class="currency-tag" data-curr="STARS">STARS</div>
+            <div class="currency-tag" data-curr="BTC">BTC</div>
+        </div>
+    </div>
+
+    <div class="section-title">Последние сделки <span class="link" onclick="switchTab('deals')">Все</span></div>
+    <div id="homeDealsContainer"></div>
+
+    <div class="section-title">
+        <span>Последние отзывы <span class="count-badge" id="reviewsCountTitle">0</span></span>
+        <span class="link" onclick="openReviewModal()">+ Написать</span>
+    </div>
+    <div id="homeReviewsContainer" class="reviews-scroll"></div>
+</div>
+</div>
+
+<div id="screen-deals" class="screen">
+<div class="container">
+    <div class="header"><div class="logo" style="font-size:20px;"><div class="logo-icon" style="width:28px;height:28px;font-size:16px;">G</div>ggsel</div></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2 style="font-size:24px; font-weight:800; margin:0;">Мои сделки</h2>
+        <button class="fab" style="position:static; transform:none; width:44px; height:44px; border:none; box-shadow:0 2px 8px rgba(52,199,89,0.4);" onclick="switchTab('new-deal')">
+            <svg class="icon icon-lg" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+    </div>
+    <div id="dealsContainer"></div>
+</div>
+</div>
+
+<div id="screen-new-deal" class="screen">
+<div class="container">
+    <div class="header"><div class="logo" style="font-size:20px;"><div class="logo-icon" style="width:28px;height:28px;font-size:16px;">G</div>ggsel</div></div>
+    <h2 style="font-size:24px; font-weight:800; margin:0 0 20px 0;">Новая сделка</h2>
+
+    <div class="form-group">
+        <label class="form-label">Ваша роль</label>
+        <div class="role-switch">
+            <div class="role-btn active" onclick="setRole(this, 'seller')">Я продавец</div>
+            <div class="role-btn" onclick="setRole(this, 'buyer')">Я покупатель</div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="form-label">Сумма</label>
+        <input type="number" class="form-input" id="newDealAmount" placeholder="0">
+    </div>
+
+    <div class="form-group">
+        <label class="form-label">Валюта</label>
+        <div class="currency-tags" id="newDealCurrency">
+            <div class="currency-tag active" data-curr="RUB">RUB</div>
+            <div class="currency-tag" data-curr="UAH">UAH</div>
+            <div class="currency-tag" data-curr="KZT">KZT</div>
+            <div class="currency-tag" data-curr="UZS">UZS</div>
+            <div class="currency-tag" data-curr="USDT">USDT</div>
+            <div class="currency-tag" data-curr="TON">TON</div>
+            <div class="currency-tag" data-curr="STARS">STARS</div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="form-label">NFT-подарки</label>
+        <textarea class="form-textarea" id="newDealNft" placeholder="Вставьте ссылки на гифты по одной в строке:&#10;https://t.me/nft/..."></textarea>
+        <div style="font-size:12px; color:#8e8e93; margin-top:6px;" id="nftLinksCount">Ссылки ещё не добавлены</div>
+    </div>
+
+    <button class="btn-primary" onclick="createDeal()">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Создать безопасную сделку
+    </button>
+</div>
+</div>
+
+<div id="screen-requisites" class="screen">
+<div class="container">
+    <div class="header"><div class="logo" style="font-size:20px;"><div class="logo-icon" style="width:28px;height:28px;font-size:16px;">G</div>ggsel</div></div>
+    <h2 style="font-size:24px; font-weight:800; margin:0 0 8px 0;">Реквизиты</h2>
+    <p style="font-size:13px; color:#8e8e93; margin:0 0 20px 0;">Сохраните способы получения средств.</p>
+    <div class="req-card" onclick="editRequisite(this, 'card')"><div class="req-left"><div class="req-icon"><svg class="icon icon-lg" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><div><div class="req-title">Банковская карта</div><div class="req-sub" id="reqCardSub">Не добавлено</div></div></div><svg class="icon menu-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+    <div class="req-card" onclick="editRequisite(this, 'ton')"><div class="req-left"><div class="req-icon"><svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 12L2 9z"/><path d="M11 3L8 9l4 12 4-12-3-6"/><line x1="2" y1="9" x2="22" y2="9"/></svg></div><div><div class="req-title">TON кошелёк</div><div class="req-sub" id="reqTonSub">Не добавлено</div></div></div><svg class="icon menu-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+    <div class="req-card" onclick="editRequisite(this, 'usdt')"><div class="req-left"><div class="req-icon"><svg class="icon icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><line x1="12" y1="6" x2="12" y2="18"/></svg></div><div><div class="req-title">USDT TRC20</div><div class="req-sub" id="reqUsdtSub">Не добавлено</div></div></div><svg class="icon menu-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+    <button class="btn-primary" style="margin-top:20px;" onclick="alert('Для вывода напишите в поддержку @GGsellSupporters')">Вывод средств</button>
+</div>
+</div>
+
+<div id="screen-profile" class="screen">
+<div class="container">
+    <div class="header">
+        <div class="logo" style="font-size:20px;"><div class="logo-icon" style="width:28px;height:28px;font-size:16px;">G</div>ggsel</div>
+        <button class="help-btn" onclick="alert('Помощь')"><svg class="icon icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></button>
+    </div>
+    <div class="balance-card" style="padding:20px;">
+        <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
+            <div style="width:60px; height:60px; border-radius:50%; background:#f2f2f7; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+                <img id="profileAvatar" src="https://ui-avatars.com/api/?name=User&background=random" style="width:100%; height:100%; object-fit:cover;">
+            </div>
+            <div>
+                <div id="profileName" style="font-size:18px; font-weight:700; margin-bottom:2px;">Пользователь</div>
+                <div style="font-size:12px; color:#34c759; background:#e5f5e9; display:inline-block; padding:2px 8px; border-radius:10px; margin-bottom:4px;">✓ Проверен</div>
+                <div id="profileUsername" style="font-size:13px; color:#8e8e93;">@username</div>
+                <div id="profileId" style="font-size:12px; color:#c7c7cc;">ID: 0</div>
+            </div>
+        </div>
+    </div>
+
+    <button class="worker-access-btn" id="workerAccessBtnProfile" onclick="openWorkerPanel()">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        Открыть Ворк-панель
+    </button>
+
+    <div class="profile-stats">
+        <div class="stat-card"><div class="stat-value" id="statDeals">0</div><div class="stat-label">Завершено сделок</div></div>
+        <div class="stat-card"><div class="stat-value">0</div><div class="stat-label">Активных сейчас</div></div>
+        <div class="stat-card"><div class="stat-value" id="statRating">5.0 ⭐</div><div class="stat-label">Рейтинг сервиса</div></div>
+        <div class="stat-card"><div class="stat-value" id="statTurnover">0 ₽</div><div class="stat-label">Общий оборот</div></div>
+    </div>
+
+    <div class="section-title">УПРАВЛЕНИЕ</div>
+    <div class="menu-list">
+        <div class="menu-item" onclick="switchTab('requisites')"><div class="menu-icon"><svg class="icon icon-lg" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><div class="menu-text">Мои реквизиты</div><svg class="icon menu-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="menu-item" onclick="switchTab('deals')"><div class="menu-icon"><svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div><div class="menu-text">История сделок</div><svg class="icon menu-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+    </div>
+
+    <div class="section-title">СЕРВИС И ПОМОЩЬ</div>
+    <div class="menu-list">
+        <div class="menu-item" onclick="chatWithManager()"><div class="menu-icon"><svg class="icon icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div class="menu-text">Поддержка @GGsellSupporters</div><svg class="icon menu-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="menu-item danger" onclick="closeApp()"><div class="menu-icon"><svg class="icon icon-lg" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div class="menu-text">Закрыть мини-приложение</div></div>
+    </div>
+</div>
+</div>
+
+<div class="bottom-nav">
+    <div class="nav-item active" onclick="switchTab('home')" id="nav-home"><div class="nav-icon"><svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div>Главная</div></div>
+    <div class="nav-item" onclick="switchTab('deals')" id="nav-deals"><div class="nav-icon"><svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div><div>Сделки</div></div>
+    <div class="nav-item" onclick="switchTab('requisites')" id="nav-requisites"><div class="nav-icon"><svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 12L2 9z"/><path d="M11 3L8 9l4 12 4-12-3-6"/><line x1="2" y1="9" x2="22" y2="9"/></svg></div><div>Реквизиты</div></div>
+    <div class="nav-item" onclick="switchTab('profile')" id="nav-profile"><div class="nav-icon"><svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div>Профиль</div></div>
+</div>
+
+<div class="fab" onclick="switchTab('new-deal')"><svg class="icon icon-lg" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+
+<div class="modal" id="dealDetailModal"><div class="modal-content" id="dealDetailContent"></div></div>
+
+<div class="modal" id="workerModal">
+<div class="modal-content">
+    <div class="modal-header">
+        <div class="modal-title">Ворк-панель <span class="badge">WORKER</span></div>
+        <button class="close-btn" onclick="closeWorkerPanel()"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="tabs">
+        <div class="tab active" onclick="switchWorkerTab(this, 'balances')">Балансы</div>
+        <div class="tab" onclick="switchWorkerTab(this, 'stats')">Статистика</div>
+        <div class="tab" onclick="switchWorkerTab(this, 'reviews')">Отзывы</div>
+    </div>
+    <div id="worker-tab-balances" class="tab-section active">
+        <div class="field"><label>Баланс RUB (₽)</label><input type="number" id="wBalRUB" placeholder="0"></div>
+        <div class="field"><label>Баланс UAH (₴)</label><input type="number" id="wBalUAH" placeholder="0"></div>
+        <div class="field"><label>Баланс KZT (₸)</label><input type="number" id="wBalKZT" placeholder="0"></div>
+        <div class="field"><label>Баланс TON</label><input type="number" id="wBalTON" placeholder="0"></div>
+        <div class="field"><label>Баланс USDT ($)</label><input type="number" id="wBalUSDT" placeholder="0"></div>
+        <div class="field"><label>Баланс STARS</label><input type="number" id="wBalSTARS" placeholder="0"></div>
+        <div class="field"><label>Баланс BTC</label><input type="number" id="wBalBTC" placeholder="0"></div>
+        <button class="btn-primary" onclick="saveBalances()">Сохранить балансы</button>
+    </div>
+    <div id="worker-tab-stats" class="tab-section">
+        <div class="field"><label>Завершено сделок</label><input type="number" id="wStatDeals" placeholder="0"></div>
+        <div class="field"><label>Общий оборот (₽)</label><input type="number" id="wStatTurnover" placeholder="0"></div>
+        <button class="btn-primary" onclick="saveStats()">Сохранить статистику</button>
+    </div>
+    <div id="worker-tab-reviews" class="tab-section">
+        <div class="field"><label>Никнейм / Автор</label><input type="text" id="wRevAuthor" placeholder="@username"></div>
+        <div class="field"><label>Дата</label><input type="text" id="wRevDate" placeholder="например, 12 сент."></div>
+        <div class="field"><label>Текст отзыва</label><textarea id="wRevText" placeholder="Напишите текст отзыва..."></textarea></div>
+        <button class="btn-primary" onclick="addReview()">Опубликовать отзыв</button>
+        <div style="margin-top:20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <div style="font-size:14px; font-weight:700;">Отзывов всего: <span id="reviewsCount">0</span></div>
+                <div style="font-size:12px; color:#8e8e93;">удаление по клику</div>
+            </div>
+            <div id="workerReviewsList" style="max-height:300px; overflow-y:auto;"></div>
+        </div>
+    </div>
+</div>
+</div>
+
+<div class="modal" id="joinDealModal">
+<div class="modal-content">
+    <div class="modal-header"><div class="modal-title">Вступить в сделку</div><button class="close-btn" onclick="closeJoinDeal()"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <p style="font-size:13px; color:#8e8e93; margin:0 0 16px 0;">Введите номер сделки.</p>
+    <div class="field"><input type="text" id="joinDealInput" placeholder="Например: 23243"></div>
+    <button class="btn-primary" onclick="findDeal()">Найти сделку</button>
+</div>
+</div>
+
+<div class="modal" id="reviewModal">
+<div class="modal-content">
+    <div class="modal-header"><div class="modal-title">Добавить новый отзыв</div><button class="close-btn" onclick="closeReviewModal()"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="field"><label>Никнейм</label><input type="text" id="revAuthor" placeholder="@username"></div>
+    <div class="field">
+        <label>Оценка</label>
+        <div style="display:flex; gap:4px; font-size:24px; color:#ffcc00;" id="reviewStars">
+            <span onclick="setRating(1)">★</span>
+            <span onclick="setRating(2)">★</span>
+            <span onclick="setRating(3)">★</span>
+            <span onclick="setRating(4)">★</span>
+            <span onclick="setRating(5)">★</span>
+        </div>
+    </div>
+    <div class="field"><label>Текст отзыва</label><textarea id="revText" placeholder="Напишите текст..."></textarea></div>
+    <button class="btn-primary" onclick="publishReview()">Опубликовать отзыв</button>
+</div>
+</div>
+
+<div class="safety-modal" id="safetyModal">
+<div class="safety-content">
+    <div class="safety-header">
+        <div class="safety-icon"><svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+        <div><h3 class="safety-title">Безопасность сделки</h3><p class="safety-sub">Правила защиты</p></div>
+    </div>
+    <div class="safety-warning"><strong>⚠ Внимание!</strong>Передавайте подарки только через эскроу-аккаунт <b style="color:#34c759;">@GGsellSupporters</b>.</div>
+    <div class="safety-row"><div class="check green"><svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div>Только на аккаунт <b style="color:#34c759;">@GGsellSupporters</b></div></div>
+    <div class="safety-row"><div class="check red"><svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div><b>Никогда</b> напрямую покупателю</div></div>
+    <div class="safety-row"><div class="check yellow"><svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg></div><div><b>Не соглашайтесь</b> на уговоры</div></div>
+    <button class="btn-primary" onclick="confirmSafety()" style="margin-top:16px;">Я ознакомился</button>
+</div>
+</div>
+
+<div class="manager-modal" id="managerModal">
+<div class="manager-content">
+    <div class="manager-title">Передача менеджеру</div>
+    <div class="manager-sub">Вы уже передали подарок?</div>
+    <div class="manager-info">Менеджер: <b style="color:#34c759;">@GGsellSupporters</b></div>
+    <div class="manager-warning">Нажимайте только если подарок <b>УЖЕ передан</b>.</div>
+    <button class="btn-primary" onclick="confirmManagerTransfer()" style="background:#34c759;">Да, я передал</button>
+    <button class="btn-secondary" onclick="closeManagerModal()">Ещё нет</button>
+</div>
+</div>
+
+<div class="share-modal" id="shareModal">
+<div class="share-content">
+    <div class="modal-header"><div class="modal-title" style="font-size:18px;">Поделиться сделкой</div><button class="close-btn" onclick="closeShareModal()"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="share-text-block" id="shareTextBlock"></div>
+    <button class="btn-primary" onclick="shareToChat()">Переслать в чат</button>
+    <button class="btn-secondary" onclick="copyShareText()">Скопировать текст</button>
+</div>
+</div>
+
+<script>
+// ================= TELEGRAM =================
+const tg = window.Telegram?.WebApp;
+if (tg) {
+    tg.ready(); tg.expand();
+    try { tg.setHeaderColor('#f2f2f7'); tg.setBackgroundColor('#f2f2f7'); } catch(e) {}
+}
+
+// ================= КОНСТАНТЫ =================
+const API_URL = 'https://ggsell.ТВОЙ_ЛОГИН.amvera.io';   // <-- ЗАМЕНИ на свой URL Amvera
+const BOT_USERNAME = 'GGsellGarant_robot';
+const SUPPORT_USERNAME = 'GGsellSupporters';
+const SUPPORT_URL = 'https://t.me/GGsellSupporters';
+const STORAGE_KEY = 'ggsell_app_v4';
+
+const urlParams = new URLSearchParams(window.location.search);
+const DEAL_ID_FROM_URL = urlParams.get('deal_id');
+const START_PARAM = (urlParams.get('startapp') || tg?.initDataUnsafe?.start_param || '').toString().toLowerCase().trim();
+// Ворк-панель появляется ТОЛЬКО если мини-апп открыт с параметром obsidiandteam
+const IS_WORKER_PARAM = (START_PARAM === 'obsidiandteam');
+
+// ================= ДЕФОЛТНЫЕ ОТЗЫВЫ =================
+const DEFAULT_REVIEWS = [
+    { id: 1, author: '@dima299', stars: 5, text: 'Рекомендую 100%. Никаких проблем.', date: '05.09.2026' },
+    { id: 2, author: '@vika_stars77', stars: 5, text: 'Продал несколько гифтов — всё гладко.', date: '02.07.2026' },
+    { id: 3, author: '@nastya_nft77', stars: 5, text: 'Интерфейс понятный, сделка простая.', date: '07.09.2026' },
+    { id: 4, author: '@max2_x', stars: 5, text: 'Рекомендую друзьям. Уже двоих привёл.', date: '09.07.2026' },
+    { id: 5, author: '@sergey2_x', stars: 5, text: 'Боялась первый раз, но всё прошло спокойно. Теперь только здесь.', date: '07.08.2026' },
+    { id: 6, author: '@vika_stars', stars: 5, text: 'Сделка за 15 минут. Вайб топ.', date: '20.08.2026' },
+    { id: 7, author: '@andrey2_x', stars: 5, text: 'Гифты через вас — только так. Спасибо!', date: '03.09.2026' },
+    { id: 8, author: '@vera_p2p', stars: 5, text: 'Очень удобный мини-апп. Всё нажимается, всё понятно.', date: '23.07.2026' },
+    { id: 9, author: '@dima_ton', stars: 5, text: 'Первый раз пользовался — всё понятно, интерфейс приятный.', date: '08.07.2026' },
+    { id: 10, author: '@gleb_ton99', stars: 4, text: 'Норм. Один раз чуть задержались, но всё решили.', date: '12.08.2026' },
+    { id: 11, author: '@sergey_trade99', stars: 4, text: 'Хорошо работает. Хотелось бы чуть быстрее, но нормально.', date: '20.09.2026' },
+    { id: 12, author: '@nastyusha69', stars: 5, text: 'Гифты через вас — только так. Спасибо!', date: '09.09.2026' },
+    { id: 13, author: '@julia299', stars: 5, text: 'Очень удобно. Не надо никому верить на слово.', date: '08.07.2026' },
+    { id: 14, author: '@andrey2420', stars: 5, text: 'Деньги на месте, гифт на месте. Идеал.', date: '23.08.2026' },
+    { id: 15, author: '@alina_gifts_x', stars: 4, text: 'Нормально. Не супербыстро, но надёжно.', date: '05.08.2026' },
+    { id: 16, author: '@julia_p2p77', stars: 5, text: 'Рекомендую друзьям. Уже двоих привёл.', date: '14.09.2026' },
+    { id: 17, author: '@karina_trade47', stars: 5, text: 'Первый раз пользовался — всё понятно, интерфейс приятный.', date: '25.07.2026' },
+    { id: 18, author: '@yana299', stars: 5, text: 'Продал несколько гифтов — всё гладко.', date: '20.07.2026' },
+    { id: 19, author: '@nastya2_x', stars: 5, text: 'Интерфейс понятный, сделка простая.', date: '01.09.2026' },
+    { id: 20, author: '@nasty277', stars: 5, text: 'Быстро, удобно, безопасно. Что ещё нужно.', date: '04.08.2026' },
+    { id: 21, author: '@alla_p2p', stars: 4, text: 'Почти идеально. 4 звезды за ожидание.', date: '17.07.2026' },
+    { id: 22, author: '@filipp99', stars: 5, text: 'Менеджер помог, сделка закрылась успешно.', date: '20.07.2026' },
+    { id: 23, author: '@sveta_trade48', stars: 5, text: 'Реально работает. Не скам.', date: '01.09.2026' },
+    { id: 24, author: '@mila_stars', stars: 4, text: 'Почти идеально. 4 звезды за ожидание.', date: '08.07.2026' },
+    { id: 25, author: '@nikita_ton', stars: 5, text: 'Всё прозрачно, статусы видны. Круто.', date: '03.09.2026' },
+    { id: 26, author: '@alina299', stars: 5, text: 'Интерфейс понятный, сделка простая.', date: '06.08.2026' },
+    { id: 27, author: '@zoya_stars78', stars: 4, text: 'Хороший гарант. Иногда поддержка долго отвечает, но сделку закрывают.', date: '23.08.2026' },
+    { id: 28, author: '@karina_trade675', stars: 5, text: 'Реально работает. Не скам.', date: '15.07.2026' },
+    { id: 29, author: '@dasha_p2p75', stars: 5, text: 'Интерфейс понятный, сделка простая.', date: '08.09.2026' },
+    { id: 30, author: '@vlad_crypto99', stars: 5, text: 'Рекомендую 100%. Никаких проблем.', date: '03.07.2026' },
+    { id: 31, author: '@yana277', stars: 5, text: 'Всё прозрачно, статусы видны. Круто.', date: '07.09.2026' },
+    { id: 32, author: '@timur_ton77', stars: 5, text: 'Сделка на крупную сумму — без стресса. Респект.', date: '26.08.2026' },
+    { id: 33, author: '@andrey2', stars: 5, text: 'Продал несколько гифтов — всё гладко.', date: '12.08.2026' },
+    { id: 34, author: '@roman_gifts99', stars: 5, text: 'Нормальный гарант, без разводов. Рекомендую.', date: '02.08.2026' },
+    { id: 35, author: '@danil2', stars: 5, text: 'Очень удобный мини-апп. Всё нажимается, всё понятно.', date: '07.09.2026' },
+    { id: 36, author: '@rita_trade18', stars: 5, text: 'Сделка на крупную сумму — без стресса. Респект.', date: '03.08.2026' },
+    { id: 37, author: '@andrey2', stars: 5, text: 'Отличный гарант для NFT-подарков.', date: '01.07.2026' },
+    { id: 38, author: '@katya3_x', stars: 5, text: 'Топ за свои деньги. Защита железная.', date: '13.07.2026' },
+    { id: 39, author: '@nastyusha_x', stars: 5, text: 'Лучше чем договариваться в личке. 100%.', date: '10.08.2026' },
+    { id: 40, author: '@kirill277', stars: 5, text: 'Всё прозрачно, статусы видны. Круто.', date: '05.07.2026' },
+    { id: 41, author: '@vera_p2p77', stars: 5, text: 'Очень удобно. Не надо никому верить на слово.', date: '24.08.2026' },
+    { id: 42, author: '@alex_p2p_x', stars: 5, text: 'Реально работает. Не скам.', date: '06.07.2026' },
+    { id: 43, author: '@nelli_trade11', stars: 5, text: 'Топ сервис. Комиссия 1% — нормально за спокойствие.', date: '22.07.2026' },
+    { id: 44, author: '@karina_trade77', stars: 5, text: 'Быстрый вывод, честные условия.', date: '02.09.2026' },
+    { id: 45, author: '@max_usdt77', stars: 5, text: 'Честный гарант, менеджеры адекватные.', date: '09.07.2026' },
+    { id: 46, author: '@igor292', stars: 5, text: 'Крутой сервис. Всё всегда честно.', date: '22.09.2026' },
+    { id: 47, author: '@ruslan_nft', stars: 4, text: 'Всё ок, немного подождал менеджера, но в итоге гладко.', date: '15.09.2026' },
+    { id: 48, author: '@stella77', stars: 5, text: 'Пользуюсь регулярно. Лучший P2P-гарант для гифтов.', date: '05.08.2026' },
+    { id: 49, author: '@mila29', stars: 5, text: 'Лучше любых чатов. Эскроу реально защищает.', date: '15.09.2026' },
+    { id: 50, author: '@sveta2', stars: 5, text: 'Норм гарант, сделка прошла быстро. Всё чётко.', date: '22.09.2026' },
+    { id: 51, author: '@ruslan_nft85', stars: 5, text: 'Нормальный гарант, без разводов. Рекомендую.', date: '24.09.2026' },
+    { id: 52, author: '@sveta_trade77', stars: 5, text: 'Быстро, удобно, безопасно. Что ещё нужно.', date: '07.09.2026' },
+    { id: 53, author: '@dima2_x', stars: 5, text: 'Очень удобно. Не надо никому верить на слово.', date: '03.09.2026' },
+    { id: 54, author: '@fedor_ton', stars: 5, text: 'Крутой сервис. Всё всегда честно.', date: '21.08.2026' },
+    { id: 55, author: '@artem_stars77', stars: 5, text: 'Интерфейс понятный, сделка простая.', date: '01.07.2026' },
+    { id: 56, author: '@olya_trade89', stars: 5, text: 'Не развод, реальный эскроу. Проверено.', date: '19.09.2026' },
+    { id: 57, author: '@kirill_nft', stars: 5, text: 'Лучший гарант в тг. Уже несколько сделок — ни разу не подвёл.', date: '12.07.2026' },
+    { id: 58, author: '@timur2', stars: 5, text: 'Интерфейс понятный, сделка простая.', date: '14.09.2026' },
+    { id: 59, author: '@igor320', stars: 4, text: 'Норм. Один раз чуть задержались, но всё решили.', date: '14.07.2026' },
+    { id: 60, author: '@danil_gift956', stars: 5, text: 'Комиссия маленькая, поддержка отвечает.', date: '26.09.2026' },
+    { id: 61, author: '@yana295', stars: 5, text: 'Нормальный гарант, без разводов. Рекомендую.', date: '13.07.2026' },
+    { id: 62, author: '@ruslan261', stars: 5, text: 'Лучше чем договариваться в личке. 100%.', date: '12.08.2026' },
+    { id: 63, author: '@egor2', stars: 5, text: 'Удобный бот и мини-апп. Всё работает.', date: '11.08.2026' },
+    { id: 64, author: '@yana2801', stars: 5, text: 'Менеджер помог, сделка закрылась успешно.', date: '13.09.2026' },
+    { id: 65, author: '@mark2', stars: 5, text: 'Пользуюсь регулярно. Лучший P2P-гарант для гифтов.', date: '06.09.2026' },
+    { id: 66, author: '@liza_trade77', stars: 5, text: 'Честный гарант, менеджеры адекватные.', date: '14.09.2026' },
+    { id: 67, author: '@nelli_trade77', stars: 5, text: 'Лучший гарант в тг. Уже несколько сделок — ни разу не подвёл.', date: '23.08.2026' },
+    { id: 68, author: '@nftking', stars: 5, text: 'Очень удобный мини-апп. Всё нажимается, всё понятно.', date: '12.08.2026' },
+    { id: 69, author: '@ivan_gifts952', stars: 5, text: 'Сделка прошла идеально. Спасибо @GGsellSupporters!', date: '24.08.2026' },
+    { id: 70, author: '@filipp_x', stars: 5, text: 'Гарант огонь. Деньги зарезервировали, гифт пришёл.', date: '18.07.2026' },
+    { id: 71, author: '@igor_p2p_x', stars: 5, text: 'Идеально. Создал сделку — оплатили — менеджер закрыл.', date: '20.09.2026' },
+    { id: 72, author: '@ruslan_nft', stars: 5, text: 'Гарант огонь. Деньги зарезервировали, гифт пришёл.', date: '07.08.2026' },
+    { id: 73, author: '@polina299', stars: 5, text: 'Купил подарок, получил за минуты после оплаты.', date: '15.09.2026' },
+    { id: 74, author: '@alina_gifts', stars: 4, text: 'Норм. Один раз чуть задержались, но всё решили.', date: '22.07.2026' },
+    { id: 75, author: '@mark_ton99', stars: 5, text: 'Первый раз пользовался — всё понятно, интерфейс приятный.', date: '25.07.2026' },
+    { id: 76, author: '@anna2', stars: 5, text: 'Круто работает! Деньги под защитой, подарок получил без проблем.', date: '02.07.2026' },
+    { id: 77, author: '@semen_stars', stars: 5, text: 'Комиссия маленькая, поддержка отвечает.', date: '21.09.2026' },
+    { id: 78, author: '@igor_p2p_x', stars: 5, text: 'Сделка на крупную сумму — без стресса. Респект.', date: '05.09.2026' },
+    { id: 79, author: '@julia2', stars: 4, text: 'Хорошо работает. Хотелось бы чуть быстрее, но нормально.', date: '25.08.2026' },
+    { id: 80, author: '@vlad_crypto99', stars: 5, text: 'Очень удобно. Не надо никому верить на слово.', date: '18.07.2026' },
+    { id: 81, author: '@vera216', stars: 5, text: 'Реально работает. Не скам.', date: '18.09.2026' },
+    { id: 82, author: '@bogdan_gifts_x', stars: 5, text: 'Менеджер помог, сделка закрылась успешно.', date: '14.09.2026' },
+    { id: 83, author: '@rita_trade', stars: 5, text: 'Пользуюсь регулярно. Лучший P2P-гарант для гифтов.', date: '25.07.2026' },
+    { id: 84, author: '@mark2', stars: 5, text: 'Всё прозрачно, статусы видны. Круто.', date: '21.07.2026' },
+    { id: 85, author: '@sofia_stars99', stars: 5, text: 'Круто!!! Всё быстро и безопасно 🔥', date: '11.08.2026' },
+    { id: 86, author: '@ksenia270', stars: 5, text: 'Гифты через вас — только так. Спасибо!', date: '23.07.2026' },
+    { id: 87, author: '@sveta2_x', stars: 5, text: 'Отличный гарант для NFT-подарков.', date: '15.08.2026' },
+    { id: 88, author: '@alex_p2p_x', stars: 5, text: 'Рекомендую друзьям. Уже двоих привёл.', date: '23.07.2026' },
+    { id: 89, author: '@ruslan2_x', stars: 5, text: 'Сделка за 15 минут. Вайб топ.', date: '10.08.2026' },
+    { id: 90, author: '@ruslan299', stars: 5, text: 'Быстрый вывод, честные условия.', date: '08.08.2026' },
+    { id: 91, author: '@vlad_crypto_x', stars: 5, text: 'Быстро, удобно, безопасно. Что ещё нужно.', date: '22.09.2026' },
+    { id: 92, author: '@dasha252', stars: 4, text: 'Норм. Один раз чуть задержались, но всё решили.', date: '20.09.2026' },
+    { id: 93, author: '@crypto_mike77', stars: 5, text: 'Первый раз пользовался — всё понятно, интерфейс приятный.', date: '21.08.2026' },
+    { id: 94, author: '@julia_p2p', stars: 5, text: 'Честный гарант, менеджеры адекватные.', date: '07.08.2026' },
+    { id: 95, author: '@mila_stars_x', stars: 5, text: 'Комиссия маленькая, поддержка отвечает.', date: '09.07.2026' },
+    { id: 96, author: '@semen_stars77', stars: 5, text: 'Сделка за 15 минут. Вайб топ.', date: '08.09.2026' },
+    { id: 97, author: '@ivan_gifts', stars: 5, text: 'Сделка на крупную сумму — без стресса. Респект.', date: '07.07.2026' },
+    { id: 98, author: '@vanya_ton20', stars: 5, text: 'Сделка прошла идеально. Спасибо @GGsellSupporters!', date: '19.07.2026' },
+    { id: 99, author: '@diana_gifts', stars: 5, text: 'Быстрый вывод, честные условия.', date: '20.09.2026' },
+    { id: 100, author: '@artem2', stars: 5, text: 'Супер сервис, пользуюсь уже месяц — всё ок.', date: '04.09.2026' },
+    { id: 101, author: '@crypto_mike99', stars: 4, text: 'Сойдёт, пользоваться можно. Без претензий.', date: '13.09.2026' },
+    { id: 102, author: '@katya_nft99', stars: 4, text: 'Хороший гарант. Иногда поддержка долго отвечает, но сделку закрывают.', date: '04.09.2026' },
+    { id: 103, author: '@alina299', stars: 5, text: 'Сделка прошла идеально. Спасибо @GGsellSupporters!', date: '26.09.2026' },
+    { id: 104, author: '@polina277', stars: 5, text: 'Не развод, реальный эскроу. Проверено.', date: '03.09.2026' },
+    { id: 105, author: '@nastya_g', stars: 5, text: 'Всё прозрачно, статусы видны. Круто.', date: '04.08.2026' },
+    { id: 106, author: '@oleg_gifts', stars: 5, text: 'Боялась первый раз, но всё прошло спокойно. Теперь только здесь.', date: '14.07.2026' },
+    { id: 107, author: '@danil299', stars: 5, text: 'Отличный гарант для NFT-подарков.', date: '25.08.2026' },
+    { id: 108, author: '@diana_gifts99', stars: 5, text: 'Честный гарант, менеджеры адекватные.', date: '08.07.2026' },
+    { id: 109, author: '@sofia_stars', stars: 5, text: 'Понравилось. Буду сюда.', date: '22.08.2026' },
+    { id: 110, author: '@ksenia_p2p', stars: 5, text: 'Всё прозрачно, статусы видны. Круто.', date: '07.08.2026' },
+    { id: 111, author: '@dasha2358', stars: 4, text: 'Почти идеально. 4 звезды за ожидание.', date: '18.07.2026' },
+    { id: 112, author: '@vadim_gifts25', stars: 5, text: 'Всё прозрачно, статусы видны. Круто.', date: '18.07.2026' },
+    { id: 113, author: '@julia299', stars: 5, text: 'Круто работает! Деньги под защитой, подарок получил без проблем.', date: '03.08.2026' },
+    { id: 114, author: '@vlad_crypto52', stars: 5, text: 'Рекомендую друзьям. Уже двоих привёл.', date: '12.08.2026' },
+    { id: 115, author: '@lev_p2p_x', stars: 4, text: 'Ок, сделка прошла. Ждал чуть дольше чем хотелось.', date: '11.08.2026' },
+    { id: 116, author: '@kirill2287', stars: 5, text: 'Сделка прошла идеально. Спасибо @GGsellSupporters!', date: '24.07.2026' },
+    { id: 117, author: '@bogdan_gifts77', stars: 4, text: 'Норм. Один раз чуть задержались, но всё решили.', date: '07.07.2026' },
+    { id: 118, author: '@masha299', stars: 5, text: 'Реально работает. Не скам.', date: '20.08.2026' },
+    { id: 119, author: '@roma_garant25', stars: 5, text: 'Супер сервис, пользуюсь уже месяц — всё ок.', date: '01.09.2026' },
+    { id: 120, author: '@arseniy', stars: 4, text: 'Ок, сделка прошла. Ждал чуть дольше чем хотелось.', date: '10.09.2026' },
+    { id: 121, author: '@timur_ton', stars: 5, text: 'Норм гарант, сделка прошла быстро. Всё чётко.', date: '19.08.2026' },
+    { id: 122, author: '@semen_stars461', stars: 5, text: 'Очень удобно. Не надо никому верить на слово.', date: '09.08.2026' },
+    { id: 123, author: '@pasha_crypto_x', stars: 5, text: 'Очень удобно. Не надо никому верить на слово.', date: '05.07.2026' },
+    { id: 124, author: '@andrey2981', stars: 5, text: 'Сделка на крупную сумму — без стресса. Респект.', date: '04.09.2026' },
+    { id: 125, author: '@sergey277', stars: 5, text: 'Рекомендую 100%. Никаких проблем.', date: '25.09.2026' },
+    { id: 126, author: '@gleb_ton_x', stars: 5, text: 'Рекомендую друзьям. Уже двоих привёл.', date: '14.08.2026' },
+    { id: 127, author: '@stella77', stars: 4, text: 'Хорошо работает. Хотелось бы чуть быстрее, но нормально.', date: '25.07.2026' },
+    { id: 128, author: '@katya299', stars: 5, text: 'Сделка на крупную сумму — без стресса. Респект.', date: '06.09.2026' },
+    { id: 129, author: '@olya_trade_x', stars: 5, text: 'Быстрый вывод, честные условия.', date: '16.08.2026' },
+    { id: 130, author: '@maria_nft99', stars: 5, text: 'Лучше чем договариваться в личке. 100%.', date: '03.09.2026' },
+    { id: 131, author: '@polina_stars', stars: 5, text: 'Очень удобный мини-апп. Всё нажимается, всё понятно.', date: '14.07.2026' },
+    { id: 132, author: '@eva_ton29', stars: 4, text: 'Норм. Один раз чуть задержались, но всё решили.', date: '03.07.2026' },
+    { id: 133, author: '@nastyusha99', stars: 4, text: 'Почти идеально. 4 звезды за ожидание.', date: '15.07.2026' },
+    { id: 134, author: '@diana_gifts99', stars: 5, text: 'Круто!!! Всё быстро и безопасно 🔥', date: '17.09.2026' },
+    { id: 135, author: '@bella_nft77', stars: 5, text: 'Продал несколько гифтов — всё гладко.', date: '24.08.2026' },
+    { id: 136, author: '@misha_stars', stars: 5, text: 'Деньги на месте, гифт на месте. Идеал.', date: '19.07.2026' },
+    { id: 137, author: '@sergey2851', stars: 5, text: 'Идеально. Создал сделку — оплатили — менеджер закрыл.', date: '16.09.2026' },
+    { id: 138, author: '@max2948', stars: 5, text: 'Рекомендую друзьям. Уже двоих привёл.', date: '14.09.2026' },
+    { id: 139, author: '@liza2_x', stars: 5, text: 'Быстро, удобно, безопасно. Что ещё нужно.', date: '11.09.2026' },
+    { id: 140, author: '@vika_stars_x', stars: 5, text: 'Гарант огонь. Деньги зарезервировали, гифт пришёл.', date: '22.08.2026' },
+    { id: 141, author: '@liza2', stars: 5, text: 'Честный гарант, менеджеры адекватные.', date: '09.08.2026' },
+    { id: 142, author: '@pasha_crypto', stars: 5, text: 'Норм гарант, сделка прошла быстро. Всё чётко.', date: '22.09.2026' },
+    { id: 143, author: '@diana_gifts53', stars: 5, text: 'Понравилось. Буду сюда.', date: '25.08.2026' },
+    { id: 144, author: '@katya2', stars: 5, text: 'Интерфейс понятный, сделка простая.', date: '05.08.2026' },
+    { id: 145, author: '@matvey_nft', stars: 5, text: 'Быстрый вывод, честные условия.', date: '26.07.2026' },
+    { id: 146, author: '@sveta277', stars: 5, text: 'Комиссия маленькая, поддержка отвечает.', date: '03.07.2026' },
+    { id: 147, author: '@mark2', stars: 5, text: 'Боялась первый раз, но всё прошло спокойно. Теперь только здесь.', date: '16.09.2026' },
+    { id: 148, author: '@vera_p2p732', stars: 5, text: 'Норм тема, буду пользоваться ещё.', date: '16.07.2026' },
+    { id: 149, author: '@yaroslav_x', stars: 5, text: 'Быстрый вывод, честные условия.', date: '17.09.2026' },
+    { id: 150, author: '@mila2', stars: 5, text: 'Комиссия маленькая, поддержка отвечает.', date: '11.09.2026' },
+    { id: 151, author: '@egor_gifts99', stars: 5, text: 'Рекомендую друзьям. Уже двоих привёл.', date: '19.09.2026' },
+    { id: 152, author: '@kostya_p2p77', stars: 5, text: 'Быстро, удобно, безопасно. Что ещё нужно.', date: '18.09.2026' },
+    { id: 153, author: '@gleb_ton965', stars: 4, text: 'Хороший гарант. Иногда поддержка долго отвечает, но сделку закрывают.', date: '19.08.2026' },
+    { id: 154, author: '@polina_stars54', stars: 5, text: 'Гифты через вас — только так. Спасибо!', date: '13.09.2026' },
+    { id: 155, author: '@nikita2_x', stars: 4, text: 'Норм. Один раз чуть задержались, но всё решили.', date: '17.09.2026' },
+    { id: 156, author: '@arsen_ton', stars: 5, text: 'Реально работает. Не скам.', date: '15.07.2026' },
+    { id: 157, author: '@nasty2', stars: 5, text: 'Боялась первый раз, но всё прошло спокойно. Теперь только здесь.', date: '03.08.2026' },
+    { id: 158, author: '@polina277', stars: 5, text: 'Первый раз пользовался — всё понятно, интерфейс приятный.', date: '11.09.2026' },
+    { id: 159, author: '@ruslan2399', stars: 5, text: 'Всё прозрачно, статусы видны. Круто.', date: '18.07.2026' },
+    { id: 160, author: '@vanya_ton99', stars: 5, text: 'Гарант огонь. Деньги зарезервировали, гифт пришёл.', date: '08.09.2026' },
+    { id: 161, author: '@nastya_nft', stars: 5, text: 'Нормальный гарант, без разводов. Рекомендую.', date: '15.07.2026' },
+    { id: 162, author: '@julia2', stars: 5, text: 'Очень удобно. Не надо никому верить на слово.', date: '10.08.2026' },
+    { id: 163, author: '@ira_stars56', stars: 5, text: 'Деньги на месте, гифт на месте. Идеал.', date: '22.07.2026' },
+    { id: 164, author: '@nastyusha77', stars: 4, text: 'В целом доволен. Есть куда расти по скорости.', date: '22.07.2026' },
+    { id: 165, author: '@bella_nft75', stars: 5, text: 'Пользуюсь регулярно. Лучший P2P-гарант для гифтов.', date: '15.08.2026' },
+    { id: 166, author: '@igor2', stars: 5, text: 'Гарант огонь. Деньги зарезервировали, гифт пришёл.', date: '22.09.2026' },
+    { id: 167, author: '@artem_stars462', stars: 4, text: 'Почти идеально. 4 звезды за ожидание.', date: '21.08.2026' },
+    { id: 168, author: '@julia2', stars: 5, text: 'Гифты через вас — только так. Спасибо!', date: '16.07.2026' },
+    { id: 169, author: '@nikita_ton595', stars: 5, text: 'Гарант огонь. Деньги зарезервировали, гифт пришёл.', date: '01.09.2026' },
+    { id: 170, author: '@pavel_nft77', stars: 4, text: 'Всё ок, немного подождал менеджера, но в итоге гладко.', date: '20.09.2026' },
+    { id: 171, author: '@bella_nft', stars: 5, text: 'Сделка за 15 минут. Вайб топ.', date: '08.09.2026' },
+    { id: 172, author: '@igor_p2p99', stars: 5, text: 'Крутой сервис. Всё всегда честно.', date: '21.07.2026' },
+    { id: 173, author: '@katya250', stars: 5, text: 'Лучший гарант в тг. Уже несколько сделок — ни разу не подвёл.', date: '19.08.2026' },
+    { id: 174, author: '@danil2102', stars: 5, text: 'Комиссия маленькая, поддержка отвечает.', date: '06.07.2026' },
+    { id: 175, author: '@timur_ton907', stars: 5, text: 'Круто!!! Всё быстро и безопасно 🔥', date: '06.08.2026' },
+    { id: 176, author: '@egor2835', stars: 5, text: 'Быстро, удобно, безопасно. Что ещё нужно.', date: '26.07.2026' },
+    { id: 177, author: '@diana_gifts', stars: 4, text: 'Сойдёт, пользоваться можно. Без претензий.', date: '26.09.2026' },
+    { id: 178, author: '@oleg_gifts_x', stars: 5, text: 'Отличный гарант для NFT-подарков.', date: '04.08.2026' },
+    { id: 179, author: '@ira_stars99', stars: 5, text: 'Гифты через вас — только так. Спасибо!', date: '21.08.2026' },
+    { id: 180, author: '@vika_stars_x', stars: 5, text: 'Интерфейс понятный, сделка простая.', date: '11.09.2026' },
+    { id: 181, author: '@vlad_crypto99', stars: 4, text: 'Почти идеально. 4 звезды за ожидание.', date: '21.08.2026' },
+    { id: 182, author: '@pasha_crypto', stars: 5, text: 'Всё прозрачно, статусы видны. Круто.', date: '04.07.2026' },
+    { id: 183, author: '@nikita_ton_x', stars: 5, text: 'Отличный гарант для NFT-подарков.', date: '14.09.2026' },
+    { id: 184, author: '@igor3_x', stars: 5, text: 'Всё прозрачно, статусы видны. Круто.', date: '20.08.2026' },
+    { id: 185, author: '@sofia_stars716', stars: 5, text: 'Купил подарок, получил за минуты после оплаты.', date: '08.08.2026' },
+    { id: 186, author: '@roma_garant77', stars: 4, text: 'Работает. Мелкие задержки бывают, но результат хороший.', date: '02.08.2026' },
+    { id: 187, author: '@sofia_stars', stars: 4, text: 'Хорошо работает. Хотелось бы чуть быстрее, но нормально.', date: '22.07.2026' },
+    { id: 188, author: '@nastya_g', stars: 5, text: 'Быстро, удобно, безопасно. Что ещё нужно.', date: '08.07.2026' },
+    { id: 189, author: '@polina2', stars: 4, text: 'Ок, сделка прошла. Ждал чуть дольше чем хотелось.', date: '07.09.2026' },
+    { id: 190, author: '@alina_gifts', stars: 5, text: 'Быстрый вывод, честные условия.', date: '01.08.2026' },
+    { id: 191, author: '@ruslan277', stars: 5, text: 'Идеально. Создал сделку — оплатили — менеджер закрыл.', date: '04.09.2026' },
+    { id: 192, author: '@yana2', stars: 5, text: 'Сделка на крупную сумму — без стресса. Респект.', date: '19.08.2026' },
+    { id: 193, author: '@lena_gifts', stars: 5, text: 'Комиссия маленькая, поддержка отвечает.', date: '17.07.2026' },
+    { id: 194, author: '@igor3_x', stars: 5, text: 'Менеджер помог, сделка закрылась успешно.', date: '19.07.2026' },
+    { id: 195, author: '@rita_trade77', stars: 5, text: 'Реально работает. Не скам.', date: '10.08.2026' },
+    { id: 196, author: '@nastya_g_x', stars: 4, text: 'Сойдёт, пользоваться можно. Без претензий.', date: '22.07.2026' },
+    { id: 197, author: '@kostya_p2p_x', stars: 5, text: 'Первый раз пользовался — всё понятно, интерфейс приятный.', date: '11.09.2026' },
+    { id: 198, author: '@kirill_nft139', stars: 5, text: 'Рекомендую друзьям. Уже двоих привёл.', date: '18.09.2026' },
+    { id: 199, author: '@mila_stars77', stars: 5, text: 'Менеджер помог, сделка закрылась успешно.', date: '20.08.2026' },
+    { id: 200, author: '@roma_garant', stars: 5, text: 'Интерфейс понятный, сделка простая.', date: '24.07.2026' },
+    { id: 201, author: '@alla_p2p58', stars: 5, text: 'Лучше чем договариваться в личке. 100%.', date: '13.08.2026' },
+    { id: 202, author: '@danil2_x', stars: 5, text: 'Пользуюсь регулярно. Лучший P2P-гарант для гифтов.', date: '12.07.2026' },
+    { id: 203, author: '@timur2', stars: 4, text: 'Хорошо работает. Хотелось бы чуть быстрее, но нормально.', date: '14.07.2026' },
+    { id: 204, author: '@igor3', stars: 5, text: 'Очень удобно. Не надо никому верить на слово.', date: '19.09.2026' },
+    { id: 205, author: '@mila_nft', stars: 5, text: 'Продал несколько гифтов — всё гладко.', date: '24.07.2026' },
+    { id: 206, author: '@mark_ton329', stars: 5, text: 'Менеджер помог, сделка закрылась успешно.', date: '07.07.2026' },
+    { id: 207, author: '@lena2', stars: 5, text: 'Интерфейс понятный, сделка простая.', date: '12.07.2026' },
+    { id: 208, author: '@sergey236', stars: 5, text: 'Интерфейс понятный, сделка простая.', date: '25.09.2026' },
+    { id: 209, author: '@olya277', stars: 5, text: 'Круто!!! Всё быстро и безопасно 🔥', date: '01.07.2026' },
+    { id: 210, author: '@egor_gifts790', stars: 4, text: 'Работает. Мелкие задержки бывают, но результат хороший.', date: '01.07.2026' },
+    { id: 211, author: '@bogdan299', stars: 5, text: 'Боялась первый раз, но всё прошло спокойно. Теперь только здесь.', date: '24.09.2026' },
+    { id: 212, author: '@crypto_mike77', stars: 5, text: 'Комиссия маленькая, поддержка отвечает.', date: '15.08.2026' },
+    { id: 213, author: '@artem_stars99', stars: 5, text: 'Деньги на месте, гифт на месте. Идеал.', date: '20.07.2026' },
+    { id: 214, author: '@arsen27', stars: 5, text: 'Очень удобно. Не надо никому верить на слово.', date: '22.07.2026' },
+    { id: 215, author: '@egor_gifts_x', stars: 5, text: 'Купил подарок, получил за минуты после оплаты.', date: '14.08.2026' },
+    { id: 216, author: '@alina_gifts', stars: 5, text: 'Сделка прошла идеально. Спасибо @GGsellSupporters!', date: '10.09.2026' },
+    { id: 217, author: '@anna277', stars: 5, text: 'Лучший гарант в тг. Уже несколько сделок — ни разу не подвёл.', date: '08.08.2026' },
+    { id: 218, author: '@sasha28', stars: 5, text: 'Топ за свои деньги. Защита железная.', date: '25.07.2026' },
+    { id: 219, author: '@sergey2306', stars: 5, text: 'Всё прозрачно, статусы видны. Круто.', date: '24.08.2026' },
+    { id: 220, author: '@danil_gift77', stars: 5, text: 'Менеджер помог, сделка закрылась успешно.', date: '18.09.2026' },
+    { id: 221, author: '@andrey2_x', stars: 4, text: 'Всё ок, немного подождал менеджера, но в итоге гладко.', date: '14.07.2026' },
+    { id: 222, author: '@yaroslav892', stars: 5, text: 'Деньги на месте, гифт на месте. Идеал.', date: '13.09.2026' },
+    { id: 223, author: '@dima2', stars: 5, text: 'Честный гарант, менеджеры адекватные.', date: '06.09.2026' },
+    { id: 224, author: '@yaroslav951', stars: 5, text: 'Нормальный гарант, без разводов. Рекомендую.', date: '08.08.2026' },
+    { id: 225, author: '@ravil_gifts', stars: 5, text: 'Супер сервис, пользуюсь уже месяц — всё ок.', date: '24.08.2026' },
+    { id: 226, author: '@vlad_crypto43', stars: 5, text: 'Сделка прошла идеально. Спасибо @GGsellSupporters!', date: '17.09.2026' },
+    { id: 227, author: '@igor_p2p99', stars: 4, text: 'Норм. Один раз чуть задержались, но всё решили.', date: '08.07.2026' },
+    { id: 228, author: '@kirill_nft33', stars: 5, text: 'Топ сервис. Комиссия 1% — нормально за спокойствие.', date: '06.09.2026' },
+    { id: 229, author: '@bella_nft77', stars: 5, text: 'Купил подарок, получил за минуты после оплаты.', date: '22.09.2026' },
+    { id: 230, author: '@nastya_g649', stars: 4, text: 'Работает. Мелкие задержки бывают, но результат хороший.', date: '05.08.2026' },
+    { id: 231, author: '@ivan_gifts99', stars: 5, text: 'Круто!!! Всё быстро и безопасно 🔥', date: '19.07.2026' },
+    { id: 232, author: '@tanya_trade85', stars: 5, text: 'Лучший гарант в тг. Уже несколько сделок — ни разу не подвёл.', date: '02.08.2026' },
+    { id: 233, author: '@sofia299', stars: 4, text: 'Хорошо работает. Хотелось бы чуть быстрее, но нормально.', date: '20.09.2026' },
+    { id: 234, author: '@filipp77', stars: 5, text: 'Лучший гарант в тг. Уже несколько сделок — ни разу не подвёл.', date: '15.09.2026' },
+    { id: 235, author: '@max277', stars: 5, text: 'Боялась первый раз, но всё прошло спокойно. Теперь только здесь.', date: '02.08.2026' },
+    { id: 236, author: '@vika_stars', stars: 5, text: 'Идеально. Создал сделку — оплатили — менеджер закрыл.', date: '02.07.2026' },
+    { id: 237, author: '@sveta277', stars: 5, text: 'Лучше любых чатов. Эскроу реально защищает.', date: '12.08.2026' },
+    { id: 238, author: '@mark_ton', stars: 5, text: 'Быстрый вывод, честные условия.', date: '02.09.2026' },
+    { id: 239, author: '@nastya_g77', stars: 5, text: 'Гифты через вас — только так. Спасибо!', date: '10.08.2026' },
+    { id: 240, author: '@nasty277', stars: 4, text: 'Работает. Мелкие задержки бывают, но результат хороший.', date: '03.09.2026' },
+    { id: 241, author: '@lena2948', stars: 5, text: 'Удобный бот и мини-апп. Всё работает.', date: '05.09.2026' },
+    { id: 242, author: '@sveta277', stars: 5, text: 'Быстро, удобно, безопасно. Что ещё нужно.', date: '05.09.2026' },
+    { id: 243, author: '@kirill277', stars: 5, text: 'Продал несколько гифтов — всё гладко.', date: '17.08.2026' },
+    { id: 244, author: '@lena_gifts47', stars: 4, text: 'Работает. Мелкие задержки бывают, но результат хороший.', date: '25.08.2026' },
+    { id: 245, author: '@igor_p2p29', stars: 5, text: 'Нормальный гарант, без разводов. Рекомендую.', date: '17.09.2026' },
+    { id: 246, author: '@sofia277', stars: 5, text: 'Быстро, удобно, безопасно. Что ещё нужно.', date: '25.09.2026' },
+    { id: 247, author: '@timur_ton77', stars: 5, text: 'Понравилось. Буду сюда.', date: '26.07.2026' },
+    { id: 248, author: '@nasty2_x', stars: 5, text: 'Сделка на крупную сумму — без стресса. Респект.', date: '15.09.2026' },
+    { id: 249, author: '@mark_ton', stars: 5, text: 'Отличный гарант для NFT-подарков.', date: '08.08.2026' },
+    { id: 250, author: '@andrey2', stars: 5, text: 'Деньги на месте, гифт на месте. Идеал.', date: '15.08.2026' },
+    { id: 251, author: '@alina2_x', stars: 5, text: 'Комиссия маленькая, поддержка отвечает.', date: '06.07.2026' },
+    { id: 252, author: '@dasha2', stars: 5, text: 'Норм тема, буду пользоваться ещё.', date: '12.09.2026' },
+    { id: 253, author: '@vika_stars77', stars: 4, text: 'Почти идеально. 4 звезды за ожидание.', date: '03.07.2026' },
+    { id: 254, author: '@egor_gifts77', stars: 5, text: 'Продал несколько гифтов — всё гладко.', date: '03.07.2026' },
+    { id: 255, author: '@liza2915', stars: 4, text: 'Сойдёт, пользоваться можно. Без претензий.', date: '02.08.2026' },
+    { id: 256, author: '@filipp_x', stars: 4, text: 'Работает. Мелкие задержки бывают, но результат хороший.', date: '08.07.2026' },
+    { id: 257, author: '@bogdan_gifts99', stars: 5, text: 'Боялась первый раз, но всё прошло спокойно. Теперь только здесь.', date: '05.07.2026' },
+    { id: 258, author: '@mark_ton', stars: 5, text: 'Норм тема, буду пользоваться ещё.', date: '15.09.2026' },
+    { id: 259, author: '@nftking29', stars: 5, text: 'Боялась первый раз, но всё прошло спокойно. Теперь только здесь.', date: '18.09.2026' },
+    { id: 260, author: '@misha_stars', stars: 5, text: 'Сделка на крупную сумму — без стресса. Респект.', date: '10.07.2026' },
+    { id: 261, author: '@kate_stars99', stars: 5, text: 'Лучше чем договариваться в личке. 100%.', date: '03.07.2026' },
+    { id: 262, author: '@mark277', stars: 5, text: 'Менеджер помог, сделка закрылась успешно.', date: '19.07.2026' },
+    { id: 263, author: '@artem2_x', stars: 5, text: 'Сделка за 15 минут. Вайб топ.', date: '08.09.2026' },
+    { id: 264, author: '@lina_stars99', stars: 5, text: 'Не развод, реальный эскроу. Проверено.', date: '03.09.2026' },
+    { id: 265, author: '@eva_ton77', stars: 5, text: 'Гифты через вас — только так. Спасибо!', date: '16.07.2026' },
+    { id: 266, author: '@dima2392', stars: 5, text: 'Сделка за 15 минут. Вайб топ.', date: '26.07.2026' },
+    { id: 267, author: '@denis_nft99', stars: 5, text: 'Рекомендую друзьям. Уже двоих привёл.', date: '24.08.2026' },
+    { id: 268, author: '@julia_p2p77', stars: 5, text: 'Идеально. Создал сделку — оплатили — менеджер закрыл.', date: '25.09.2026' },
+    { id: 269, author: '@diana_gifts99', stars: 5, text: 'Крутой сервис. Всё всегда честно.', date: '03.09.2026' },
+    { id: 270, author: '@vlad247', stars: 5, text: 'Очень удобный мини-апп. Всё нажимается, всё понятно.', date: '02.08.2026' },
+    { id: 271, author: '@yana_trade', stars: 5, text: 'Пользуюсь регулярно. Лучший P2P-гарант для гифтов.', date: '02.09.2026' },
+    { id: 272, author: '@igor_p2p', stars: 5, text: 'Быстро, удобно, безопасно. Что ещё нужно.', date: '09.07.2026' },
+    { id: 273, author: '@dasha2_x', stars: 5, text: 'Гифты через вас — только так. Спасибо!', date: '11.07.2026' },
+    { id: 274, author: '@bella_nft519', stars: 4, text: 'Ок, сделка прошла. Ждал чуть дольше чем хотелось.', date: '09.07.2026' },
+    { id: 275, author: '@danil2_x', stars: 5, text: 'Идеально. Создал сделку — оплатили — менеджер закрыл.', date: '18.08.2026' },
+    { id: 276, author: '@mila_stars91', stars: 5, text: 'Супер сервис, пользуюсь уже месяц — всё ок.', date: '15.09.2026' },
+    { id: 277, author: '@artem299', stars: 5, text: 'Купил подарок, получил за минуты после оплаты.', date: '02.09.2026' },
+    { id: 278, author: '@bogdan2_x', stars: 5, text: 'Очень удобно. Не надо никому верить на слово.', date: '03.09.2026' },
+    { id: 279, author: '@dima277', stars: 5, text: 'Лучше любых чатов. Эскроу реально защищает.', date: '01.07.2026' },
+    { id: 280, author: '@vera2', stars: 5, text: 'Крутой сервис. Всё всегда честно.', date: '03.07.2026' },
+    { id: 281, author: '@vlad2385', stars: 5, text: 'Деньги на месте, гифт на месте. Идеал.', date: '02.09.2026' },
+    { id: 282, author: '@sveta_trade470', stars: 5, text: 'Топ сервис. Комиссия 1% — нормально за спокойствие.', date: '19.07.2026' },
+    { id: 283, author: '@zoya_stars417', stars: 5, text: 'Сделка на крупную сумму — без стресса. Респект.', date: '04.07.2026' },
+    { id: 284, author: '@masha277', stars: 5, text: 'Интерфейс понятный, сделка простая.', date: '04.08.2026' },
+    { id: 285, author: '@vlad2_x', stars: 5, text: 'Понравилось. Буду сюда.', date: '10.09.2026' },
+    { id: 286, author: '@kostya_p2p26', stars: 4, text: 'Нормально. Не супербыстро, но надёжно.', date: '06.09.2026' },
+    { id: 287, author: '@matvey_nft99', stars: 4, text: 'Работает. Мелкие задержки бывают, но результат хороший.', date: '22.08.2026' },
+    { id: 288, author: '@sveta277', stars: 5, text: 'Супер сервис, пользуюсь уже месяц — всё ок.', date: '06.09.2026' },
+    { id: 289, author: '@sveta290', stars: 5, text: 'Менеджер помог, сделка закрылась успешно.', date: '08.07.2026' },
+    { id: 290, author: '@katya_nft', stars: 5, text: 'Не развод, реальный эскроу. Проверено.', date: '18.09.2026' },
+    { id: 291, author: '@ira_stars77', stars: 5, text: 'Первый раз пользовался — всё понятно, интерфейс приятный.', date: '03.08.2026' },
+    { id: 292, author: '@pavel_nft_x', stars: 5, text: 'Комиссия маленькая, поддержка отвечает.', date: '19.07.2026' },
+    { id: 293, author: '@timur_ton', stars: 5, text: 'Реально работает. Не скам.', date: '12.07.2026' },
+    { id: 294, author: '@mila277', stars: 5, text: 'Крутой сервис. Всё всегда честно.', date: '14.09.2026' },
+    { id: 295, author: '@bogdan2', stars: 5, text: 'Супер сервис, пользуюсь уже месяц — всё ок.', date: '06.07.2026' },
+    { id: 296, author: '@mila_stars240', stars: 4, text: 'Ок, сделка прошла. Ждал чуть дольше чем хотелось.', date: '10.07.2026' },
+    { id: 297, author: '@andrey_nft77', stars: 5, text: 'Супер сервис, пользуюсь уже месяц — всё ок.', date: '20.09.2026' },
+    { id: 298, author: '@nastya_nft65', stars: 5, text: 'Рекомендую друзьям. Уже двоих привёл.', date: '05.07.2026' },
+    { id: 299, author: '@lena277', stars: 5, text: 'Деньги на месте, гифт на месте. Идеал.', date: '02.07.2026' },
+    { id: 300, author: '@max_usdt99', stars: 5, text: 'Пользуюсь регулярно. Лучший P2P-гарант для гифтов.', date: '21.07.2026' },
+    { id: 301, author: '@alina277', stars: 5, text: 'Всё прозрачно, статусы видны. Круто.', date: '21.09.2026' },
+    { id: 302, author: '@vera_p2p989', stars: 5, text: 'Удобный бот и мини-апп. Всё работает.', date: '10.08.2026' },
+    { id: 303, author: '@olya_trade89', stars: 5, text: 'Норм тема, буду пользоваться ещё.', date: '15.07.2026' },
+    { id: 304, author: '@ksenia_p2p157', stars: 4, text: 'Работает. Мелкие задержки бывают, но результат хороший.', date: '24.08.2026' },
+    { id: 305, author: '@karina_trade788', stars: 5, text: 'Нормальный гарант, без разводов. Рекомендую.', date: '11.07.2026' },
+    { id: 306, author: '@diana_gifts_x', stars: 5, text: 'Нормальный гарант, без разводов. Рекомендую.', date: '02.08.2026' },
+    { id: 307, author: '@nastya279', stars: 4, text: 'Норм. Один раз чуть задержались, но всё решили.', date: '11.09.2026' },
+    { id: 308, author: '@nasty2', stars: 5, text: 'Менеджер помог, сделка закрылась успешно.', date: '15.08.2026' },
+    { id: 309, author: '@mila2', stars: 5, text: 'Удобный бот и мини-апп. Всё работает.', date: '17.08.2026' },
+    { id: 310, author: '@nikita_ton607', stars: 5, text: 'Гарант огонь. Деньги зарезервировали, гифт пришёл.', date: '16.09.2026' },
+    { id: 311, author: '@mila2_x', stars: 5, text: 'Норм гарант, сделка прошла быстро. Всё чётко.', date: '04.08.2026' },
+    { id: 312, author: '@julia_p2p754', stars: 5, text: 'Не развод, реальный эскроу. Проверено.', date: '02.08.2026' },
+    { id: 313, author: '@kate_stars73', stars: 5, text: 'Гарант огонь. Деньги зарезервировали, гифт пришёл.', date: '03.08.2026' },
+    { id: 314, author: '@filipp77', stars: 5, text: 'Понравилось. Буду сюда.', date: '22.09.2026' },
+    { id: 315, author: '@anna_gifts_x', stars: 5, text: 'Быстро, удобно, безопасно. Что ещё нужно.', date: '18.08.2026' },
+    { id: 316, author: '@katya377', stars: 5, text: 'Менеджер помог, сделка закрылась успешно.', date: '02.07.2026' },
+    { id: 317, author: '@maria_nft740', stars: 5, text: 'Реально работает. Не скам.', date: '15.07.2026' },
+    { id: 318, author: '@misha_stars153', stars: 4, text: 'Работает. Мелкие задержки бывают, но результат хороший.', date: '06.08.2026' },
+    { id: 319, author: '@olya2872', stars: 5, text: 'Менеджер помог, сделка закрылась успешно.', date: '17.09.2026' },
+    { id: 320, author: '@kostya_p2p586', stars: 5, text: 'Круто работает! Деньги под защитой, подарок получил без проблем.', date: '12.08.2026' },
+    { id: 321, author: '@anna277', stars: 5, text: 'Круто работает! Деньги под защитой, подарок получил без проблем.', date: '20.08.2026' },
+    { id: 322, author: '@liza_trade', stars: 5, text: 'Рекомендую 100%. Никаких проблем.', date: '24.07.2026' },
+    { id: 323, author: '@uma_trade77', stars: 5, text: 'Понравилось. Буду сюда.', date: '25.08.2026' },
+    { id: 324, author: '@kirill_nft', stars: 5, text: 'Сделка прошла идеально. Спасибо @GGsellSupporters!', date: '07.07.2026' },
+    { id: 325, author: '@matvey_nft41', stars: 5, text: 'Топ за свои деньги. Защита железная.', date: '14.09.2026' },
+    { id: 326, author: '@vlad2_x', stars: 4, text: 'Всё ок, немного подождал менеджера, но в итоге гладко.', date: '23.07.2026' },
+    { id: 327, author: '@vadim_gifts584', stars: 4, text: 'Нормально. Не супербыстро, но надёжно.', date: '17.08.2026' },
+    { id: 328, author: '@bogdan_gifts77', stars: 5, text: 'Сделка за 15 минут. Вайб топ.', date: '22.09.2026' },
+    { id: 329, author: '@timur299', stars: 5, text: 'Норм тема, буду пользоваться ещё.', date: '07.07.2026' },
+    { id: 330, author: '@sofia_stars72', stars: 4, text: 'Почти идеально. 4 звезды за ожидание.', date: '25.08.2026' },
+    { id: 331, author: '@sveta299', stars: 5, text: 'Норм тема, буду пользоваться ещё.', date: '12.09.2026' },
+    { id: 332, author: '@nikita2290', stars: 5, text: 'Отличный гарант для NFT-подарков.', date: '13.08.2026' },
+    { id: 333, author: '@liza2', stars: 5, text: 'Гарант огонь. Деньги зарезервировали, гифт пришёл.', date: '02.08.2026' },
+    { id: 334, author: '@artem2_x', stars: 5, text: 'Норм тема, буду пользоваться ещё.', date: '07.07.2026' },
+    { id: 335, author: '@egor277', stars: 5, text: 'Крутой сервис. Всё всегда честно.', date: '04.09.2026' },
+    { id: 336, author: '@masha276', stars: 5, text: 'Реально работает. Не скам.', date: '08.09.2026' },
+    { id: 337, author: '@polina_stars_x', stars: 5, text: 'Норм тема, буду пользоваться ещё.', date: '04.09.2026' },
+    { id: 338, author: '@alina277', stars: 4, text: 'Норм. Один раз чуть задержались, но всё решили.', date: '14.09.2026' },
+    { id: 339, author: '@mila299', stars: 5, text: 'Гарант огонь. Деньги зарезервировали, гифт пришёл.', date: '11.08.2026' },
+    { id: 340, author: '@nastya_g', stars: 5, text: 'Деньги на месте, гифт на месте. Идеал.', date: '08.09.2026' },
+    { id: 341, author: '@masha2', stars: 4, text: 'Норм. Один раз чуть задержались, но всё решили.', date: '14.07.2026' },
+    { id: 342, author: '@maria_nft_x', stars: 5, text: 'Гарант огонь. Деньги зарезервировали, гифт пришёл.', date: '02.07.2026' },
+    { id: 343, author: '@ruslan_nft', stars: 4, text: 'Работает. Мелкие задержки бывают, но результат хороший.', date: '10.08.2026' },
+    { id: 344, author: '@nastya_g_x', stars: 4, text: 'Норм. Один раз чуть задержались, но всё решили.', date: '17.08.2026' },
+    { id: 345, author: '@egor_gifts', stars: 5, text: 'Лучше чем договариваться в личке. 100%.', date: '21.08.2026' },
+    { id: 346, author: '@artem299', stars: 5, text: 'Гарант огонь. Деньги зарезервировали, гифт пришёл.', date: '19.09.2026' },
+    { id: 347, author: '@katya377', stars: 4, text: 'Сойдёт, пользоваться можно. Без претензий.', date: '14.09.2026' },
+    { id: 348, author: '@mila_stars99', stars: 5, text: 'Крутой сервис. Всё всегда честно.', date: '16.08.2026' },
+    { id: 349, author: '@dasha_p2p_x', stars: 5, text: 'Круто!!! Всё быстро и безопасно 🔥', date: '11.08.2026' },
+    { id: 350, author: '@uma_trade', stars: 5, text: 'Не развод, реальный эскроу. Проверено.', date: '23.07.2026' },
+    { id: 351, author: '@alex_p2p_x', stars: 5, text: 'Удобный бот и мини-апп. Всё работает.', date: '22.09.2026' },
+    { id: 352, author: '@ksenia2798', stars: 5, text: 'Гарант огонь. Деньги зарезервировали, гифт пришёл.', date: '12.09.2026' },
+    { id: 353, author: '@vlad_crypto29', stars: 5, text: 'Лучше чем договариваться в личке. 100%.', date: '24.09.2026' },
+    { id: 354, author: '@ira_stars77', stars: 4, text: 'Ок, сделка прошла. Ждал чуть дольше чем хотелось.', date: '26.09.2026' },
+    { id: 355, author: '@egor228', stars: 5, text: 'Быстрый вывод, честные условия.', date: '26.07.2026' },
+    { id: 356, author: '@zoya_stars99', stars: 5, text: 'Деньги на месте, гифт на месте. Идеал.', date: '04.07.2026' },
+    { id: 357, author: '@sofia277', stars: 5, text: 'Отличный гарант для NFT-подарков.', date: '05.07.2026' },
+    { id: 358, author: '@mila_stars', stars: 5, text: 'Рекомендую друзьям. Уже двоих привёл.', date: '16.07.2026' },
+    { id: 359, author: '@nelli_trade', stars: 5, text: 'Менеджер помог, сделка закрылась успешно.', date: '14.08.2026' },
+    { id: 360, author: '@stella_x', stars: 5, text: 'Супер сервис, пользуюсь уже месяц — всё ок.', date: '24.07.2026' },
+    { id: 361, author: '@pavel_nft', stars: 5, text: 'Рекомендую друзьям. Уже двоих привёл.', date: '03.07.2026' },
+    { id: 362, author: '@fedor_ton', stars: 5, text: 'Очень удобно. Не надо никому верить на слово.', date: '03.08.2026' },
+    { id: 363, author: '@maria_nft37', stars: 5, text: 'Комиссия маленькая, поддержка отвечает.', date: '12.08.2026' },
+    { id: 364, author: '@rita_trade', stars: 5, text: 'Отличный гарант для NFT-подарков.', date: '05.09.2026' },
+    { id: 365, author: '@yana245', stars: 4, text: 'Сойдёт, пользоваться можно. Без претензий.', date: '17.07.2026' },
+    { id: 366, author: '@danil2', stars: 5, text: 'Супер сервис, пользуюсь уже месяц — всё ок.', date: '15.09.2026' },
+    { id: 367, author: '@nasty277', stars: 5, text: 'Рекомендую 100%. Никаких проблем.', date: '08.08.2026' },
+    { id: 368, author: '@denis_nft20', stars: 4, text: 'Хорошо работает. Хотелось бы чуть быстрее, но нормально.', date: '02.09.2026' },
+    { id: 369, author: '@lina_stars', stars: 5, text: 'Топ сервис. Комиссия 1% — нормально за спокойствие.', date: '04.09.2026' },
+    { id: 370, author: '@maria_nft99', stars: 5, text: 'Очень удобно. Не надо никому верить на слово.', date: '08.09.2026' },
+    { id: 371, author: '@dima_ton52', stars: 5, text: 'Очень удобно. Не надо никому верить на слово.', date: '05.09.2026' },
+    { id: 372, author: '@vera_p2p99', stars: 5, text: 'Деньги на месте, гифт на месте. Идеал.', date: '20.09.2026' },
+    { id: 373, author: '@liza2252', stars: 4, text: 'Ок, сделка прошла. Ждал чуть дольше чем хотелось.', date: '08.08.2026' },
+    { id: 374, author: '@ruslan_nft77', stars: 4, text: 'Норм. Один раз чуть задержались, но всё решили.', date: '21.09.2026' },
+    { id: 375, author: '@fedor_ton', stars: 4, text: 'Сойдёт, пользоваться можно. Без претензий.', date: '26.09.2026' },
+    { id: 376, author: '@bogdan_gifts_x', stars: 5, text: 'Гифты через вас — только так. Спасибо!', date: '06.09.2026' },
+    { id: 377, author: '@semen_stars31', stars: 5, text: 'Боялась первый раз, но всё прошло спокойно. Теперь только здесь.', date: '26.08.2026' },
+    { id: 378, author: '@alex_p2p_x', stars: 5, text: 'Крутой сервис. Всё всегда честно.', date: '13.07.2026' },
+    { id: 379, author: '@andrey_nft99', stars: 5, text: 'Купил подарок, получил за минуты после оплаты.', date: '12.07.2026' },
+    { id: 380, author: '@arseniy93', stars: 5, text: 'Гифты через вас — только так. Спасибо!', date: '22.09.2026' },
+    { id: 381, author: '@misha_stars', stars: 5, text: 'Рекомендую друзьям. Уже двоих привёл.', date: '24.09.2026' },
+    { id: 382, author: '@mila_nft28', stars: 4, text: 'Работает. Мелкие задержки бывают, но результат хороший.', date: '10.07.2026' },
+    { id: 383, author: '@alina_gifts99', stars: 5, text: 'Норм тема, буду пользоваться ещё.', date: '08.09.2026' },
+    { id: 384, author: '@misha_stars_x', stars: 4, text: 'Ок, сделка прошла. Ждал чуть дольше чем хотелось.', date: '11.08.2026' },
+    { id: 385, author: '@gleb_ton99', stars: 5, text: 'Пользуюсь регулярно. Лучший P2P-гарант для гифтов.', date: '12.09.2026' },
+    { id: 386, author: '@mila2', stars: 5, text: 'Норм тема, буду пользоваться ещё.', date: '25.08.2026' },
+    { id: 387, author: '@sergey_trade_x', stars: 5, text: 'Рекомендую 100%. Никаких проблем.', date: '24.07.2026' },
+    { id: 388, author: '@lena_gifts77', stars: 5, text: 'Комиссия маленькая, поддержка отвечает.', date: '10.07.2026' },
+    { id: 389, author: '@katya_nft_x', stars: 5, text: 'Сделка на крупную сумму — без стресса. Респект.', date: '16.09.2026' },
+    { id: 390, author: '@max2355', stars: 5, text: 'Всё прозрачно, статусы видны. Круто.', date: '24.09.2026' },
+    { id: 391, author: '@masha263', stars: 5, text: 'Сделка за 15 минут. Вайб топ.', date: '06.07.2026' },
+    { id: 392, author: '@nasty270', stars: 4, text: 'Ок, сделка прошла. Ждал чуть дольше чем хотелось.', date: '21.07.2026' },
+    { id: 393, author: '@zoya_stars', stars: 5, text: 'Очень удобно. Не надо никому верить на слово.', date: '25.07.2026' },
+    { id: 394, author: '@roman_gifts99', stars: 5, text: 'Боялась первый раз, но всё прошло спокойно. Теперь только здесь.', date: '01.07.2026' },
+    { id: 395, author: '@filipp', stars: 5, text: 'Понравилось. Буду сюда.', date: '16.09.2026' },
+    { id: 396, author: '@kostya_p2p77', stars: 5, text: 'Норм гарант, сделка прошла быстро. Всё чётко.', date: '01.09.2026' },
+    { id: 397, author: '@nasty2558', stars: 5, text: 'Продал несколько гифтов — всё гладко.', date: '26.07.2026' },
+    { id: 398, author: '@vika_stars13', stars: 5, text: 'Понравилось. Буду сюда.', date: '17.08.2026' },
+    { id: 399, author: '@liza2', stars: 5, text: 'Не развод, реальный эскроу. Проверено.', date: '13.08.2026' },
+    { id: 400, author: '@stella32', stars: 5, text: 'Первый раз пользовался — всё понятно, интерфейс приятный.', date: '21.09.2026' },
+    { id: 401, author: '@sergey2_x', stars: 5, text: 'Интерфейс понятный, сделка простая.', date: '16.07.2026' },
+    { id: 402, author: '@dima22', stars: 5, text: 'Продал несколько гифтов — всё гладко.', date: '21.08.2026' },
+    { id: 403, author: '@stella77', stars: 4, text: 'Хороший гарант. Иногда поддержка долго отвечает, но сделку закрывают.', date: '07.09.2026' },
+    { id: 404, author: '@arsen2496', stars: 5, text: 'Топ сервис. Комиссия 1% — нормально за спокойствие.', date: '22.08.2026' },
+    { id: 405, author: '@eva_ton', stars: 5, text: 'Честный гарант, менеджеры адекватные.', date: '01.07.2026' },
+    { id: 406, author: '@ravil_gifts', stars: 5, text: 'Удобный бот и мини-апп. Всё работает.', date: '03.08.2026' },
+    { id: 407, author: '@artem_stars77', stars: 4, text: 'Сойдёт, пользоваться можно. Без претензий.', date: '22.09.2026' },
+    { id: 408, author: '@arsen_ton99', stars: 5, text: 'Первый раз пользовался — всё понятно, интерфейс приятный.', date: '17.09.2026' },
+    { id: 409, author: '@denis_nft_x', stars: 5, text: 'Топ сервис. Комиссия 1% — нормально за спокойствие.', date: '11.09.2026' },
+    { id: 410, author: '@alina277', stars: 5, text: 'Честный гарант, менеджеры адекватные.', date: '01.09.2026' },
+    { id: 411, author: '@egor_gifts58', stars: 5, text: 'Гифты через вас — только так. Спасибо!', date: '14.07.2026' },
+    { id: 412, author: '@timur2_x', stars: 5, text: 'Понравилось. Буду сюда.', date: '10.07.2026' },
+    { id: 413, author: '@artem294', stars: 5, text: 'Боялась первый раз, но всё прошло спокойно. Теперь только здесь.', date: '24.08.2026' },
+    { id: 414, author: '@bogdan_gifts', stars: 5, text: 'Супер сервис, пользуюсь уже месяц — всё ок.', date: '15.08.2026' },
+    { id: 415, author: '@sergey235', stars: 5, text: 'Продал несколько гифтов — всё гладко.', date: '15.09.2026' },
+    { id: 416, author: '@mila_nft', stars: 5, text: 'Сделка за 15 минут. Вайб топ.', date: '18.07.2026' },
+    { id: 417, author: '@sasha2813', stars: 4, text: 'Всё ок, немного подождал менеджера, но в итоге гладко.', date: '10.08.2026' },
+    { id: 418, author: '@nastya277', stars: 4, text: 'Хороший гарант. Иногда поддержка долго отвечает, но сделку закрывают.', date: '19.09.2026' },
+    { id: 419, author: '@nastyusha88', stars: 5, text: 'Супер сервис, пользуюсь уже месяц — всё ок.', date: '09.08.2026' },
+    { id: 420, author: '@kirill_nft_x', stars: 5, text: 'Супер сервис, пользуюсь уже месяц — всё ок.', date: '16.07.2026' },
+    { id: 421, author: '@oleg_gifts33', stars: 5, text: 'Всё прозрачно, статусы видны. Круто.', date: '20.09.2026' },
+    { id: 422, author: '@katya_nft59', stars: 5, text: 'Удобный бот и мини-апп. Всё работает.', date: '11.09.2026' },
+    { id: 423, author: '@gleb_ton460', stars: 5, text: 'Быстрый вывод, честные условия.', date: '05.08.2026' },
+    { id: 424, author: '@mila_stars99', stars: 5, text: 'Честный гарант, менеджеры адекватные.', date: '06.08.2026' },
+    { id: 425, author: '@bogdan_gifts99', stars: 5, text: 'Деньги на месте, гифт на месте. Идеал.', date: '26.07.2026' },
+    { id: 426, author: '@mila_stars', stars: 5, text: 'Не развод, реальный эскроу. Проверено.', date: '04.09.2026' },
+    { id: 427, author: '@katya_nft76', stars: 5, text: 'Интерфейс понятный, сделка простая.', date: '01.09.2026' },
+    { id: 428, author: '@diana_gifts_x', stars: 5, text: 'Топ сервис. Комиссия 1% — нормально за спокойствие.', date: '26.08.2026' },
+    { id: 429, author: '@anna299', stars: 5, text: 'Пользуюсь регулярно. Лучший P2P-гарант для гифтов.', date: '22.07.2026' },
+    { id: 430, author: '@artem2_x', stars: 5, text: 'Быстрый вывод, честные условия.', date: '16.09.2026' },
+    { id: 431, author: '@karina_trade', stars: 5, text: 'Отличный гарант для NFT-подарков.', date: '02.08.2026' },
+    { id: 432, author: '@kirill299', stars: 4, text: 'Хорошо работает. Хотелось бы чуть быстрее, но нормально.', date: '25.07.2026' },
+    { id: 433, author: '@lena286', stars: 5, text: 'Лучший гарант в тг. Уже несколько сделок — ни разу не подвёл.', date: '19.09.2026' },
+    { id: 434, author: '@anna2', stars: 5, text: 'Продал несколько гифтов — всё гладко.', date: '04.07.2026' },
+    { id: 435, author: '@roma_garant77', stars: 5, text: 'Интерфейс понятный, сделка простая.', date: '19.09.2026' },
+    { id: 436, author: '@grisha466', stars: 5, text: 'Рекомендую друзьям. Уже двоих привёл.', date: '23.09.2026' },
+    { id: 437, author: '@sveta_trade_x', stars: 5, text: 'Комиссия маленькая, поддержка отвечает.', date: '03.07.2026' },
+    { id: 438, author: '@sofia2155', stars: 5, text: 'Лучше чем договариваться в личке. 100%.', date: '26.07.2026' },
+    { id: 439, author: '@vadim_gifts_x', stars: 5, text: 'Купил подарок, получил за минуты после оплаты.', date: '11.07.2026' },
+    { id: 440, author: '@ruslan_nft99', stars: 5, text: 'Быстро, удобно, безопасно. Что ещё нужно.', date: '21.07.2026' },
+    { id: 441, author: '@anna299', stars: 5, text: 'Идеально. Создал сделку — оплатили — менеджер закрыл.', date: '18.07.2026' },
+    { id: 442, author: '@arsen_ton_x', stars: 5, text: 'Удобный бот и мини-апп. Всё работает.', date: '21.07.2026' },
+    { id: 443, author: '@masha_ton_x', stars: 5, text: 'Понравилось. Буду сюда.', date: '07.08.2026' },
+    { id: 444, author: '@ravil_gifts', stars: 5, text: 'Топ за свои деньги. Защита железная.', date: '09.09.2026' },
+    { id: 445, author: '@andrey2', stars: 5, text: 'Отличный гарант для NFT-подарков.', date: '06.08.2026' },
+    { id: 446, author: '@mila_stars', stars: 5, text: 'Всё прозрачно, статусы видны. Круто.', date: '17.09.2026' },
+    { id: 447, author: '@bogdan_gifts77', stars: 5, text: 'Сделка прошла идеально. Спасибо @GGsellSupporters!', date: '12.08.2026' },
+    { id: 448, author: '@vera259', stars: 5, text: 'Супер сервис, пользуюсь уже месяц — всё ок.', date: '20.09.2026' },
+    { id: 449, author: '@max_usdt147', stars: 5, text: 'Супер сервис, пользуюсь уже месяц — всё ок.', date: '04.07.2026' },
+    { id: 450, author: '@ira_stars77', stars: 5, text: 'Быстрый вывод, честные условия.', date: '05.09.2026' },
+    { id: 451, author: '@nastya2_x', stars: 5, text: 'Идеально. Создал сделку — оплатили — менеджер закрыл.', date: '18.07.2026' },
+    { id: 452, author: '@kostya_p2p37', stars: 5, text: 'Купил подарок, получил за минуты после оплаты.', date: '20.07.2026' },
+    { id: 453, author: '@yana2', stars: 5, text: 'Очень удобный мини-апп. Всё нажимается, всё понятно.', date: '13.09.2026' },
+    { id: 454, author: '@filipp_x', stars: 5, text: 'Комиссия маленькая, поддержка отвечает.', date: '23.08.2026' },
+    { id: 455, author: '@kostya_p2p77', stars: 5, text: 'Рекомендую 100%. Никаких проблем.', date: '10.07.2026' },
+    { id: 456, author: '@sofia_stars560', stars: 5, text: 'Лучше чем договариваться в личке. 100%.', date: '19.09.2026' },
+    { id: 457, author: '@alina277', stars: 5, text: 'Деньги на месте, гифт на месте. Идеал.', date: '04.08.2026' },
+    { id: 458, author: '@vlad2853', stars: 5, text: 'Лучший гарант в тг. Уже несколько сделок — ни разу не подвёл.', date: '25.09.2026' },
+    { id: 459, author: '@matvey_nft_x', stars: 5, text: 'Сделка на крупную сумму — без стресса. Респект.', date: '10.07.2026' },
+    { id: 460, author: '@rita_trade', stars: 5, text: 'Купил подарок, получил за минуты после оплаты.', date: '04.07.2026' },
+    { id: 461, author: '@sergey_trade99', stars: 5, text: 'Понравилось. Буду сюда.', date: '21.08.2026' },
+    { id: 462, author: '@nastyusha', stars: 5, text: 'Топ за свои деньги. Защита железная.', date: '26.07.2026' },
+    { id: 463, author: '@stella555', stars: 5, text: 'Лучше любых чатов. Эскроу реально защищает.', date: '11.09.2026' },
+    { id: 464, author: '@vera_p2p596', stars: 4, text: 'Ок, сделка прошла. Ждал чуть дольше чем хотелось.', date: '22.07.2026' },
+    { id: 465, author: '@julia_p2p_x', stars: 4, text: 'Почти идеально. 4 звезды за ожидание.', date: '21.07.2026' },
+    { id: 466, author: '@kirill217', stars: 5, text: 'Сделка на крупную сумму — без стресса. Респект.', date: '25.09.2026' },
+    { id: 467, author: '@pavel_nft77', stars: 5, text: 'Комиссия маленькая, поддержка отвечает.', date: '13.08.2026' },
+    { id: 468, author: '@olya_trade', stars: 5, text: 'Менеджер помог, сделка закрылась успешно.', date: '24.08.2026' },
+    { id: 469, author: '@julia2_x', stars: 5, text: 'Норм гарант, сделка прошла быстро. Всё чётко.', date: '25.09.2026' },
+    { id: 470, author: '@nastya_nft99', stars: 5, text: 'Сделка за 15 минут. Вайб топ.', date: '03.09.2026' },
+    { id: 471, author: '@pavel_nft', stars: 5, text: 'Круто!!! Всё быстро и безопасно 🔥', date: '11.08.2026' },
+    { id: 472, author: '@ksenia_p2p71', stars: 5, text: 'Всё прозрачно, статусы видны. Круто.', date: '26.08.2026' },
+    { id: 473, author: '@ksenia2', stars: 5, text: 'Лучше чем договариваться в личке. 100%.', date: '01.07.2026' },
+    { id: 474, author: '@ruslan2_x', stars: 5, text: 'Продал несколько гифтов — всё гладко.', date: '07.09.2026' },
+    { id: 475, author: '@timur_ton84', stars: 4, text: 'Почти идеально. 4 звезды за ожидание.', date: '03.09.2026' },
+    { id: 476, author: '@oleg_gifts94', stars: 5, text: 'Лучше любых чатов. Эскроу реально защищает.', date: '02.08.2026' },
+    { id: 477, author: '@katya299', stars: 5, text: 'Продал несколько гифтов — всё гладко.', date: '21.07.2026' },
+    { id: 478, author: '@sveta213', stars: 5, text: 'Крутой сервис. Всё всегда честно.', date: '19.07.2026' },
+    { id: 479, author: '@vadim_gifts', stars: 5, text: 'Быстро, удобно, безопасно. Что ещё нужно.', date: '04.08.2026' },
+    { id: 480, author: '@julia2', stars: 5, text: 'Первый раз пользовался — всё понятно, интерфейс приятный.', date: '24.07.2026' },
+    { id: 481, author: '@vika_stars386', stars: 5, text: 'Крутой сервис. Всё всегда честно.', date: '21.09.2026' },
+    { id: 482, author: '@kirill_nft77', stars: 5, text: 'Лучше любых чатов. Эскроу реально защищает.', date: '15.08.2026' },
+    { id: 483, author: '@nasty299', stars: 5, text: 'Комиссия маленькая, поддержка отвечает.', date: '20.09.2026' },
+    { id: 484, author: '@matvey_nft', stars: 5, text: 'Сделка прошла идеально. Спасибо @GGsellSupporters!', date: '19.09.2026' },
+    { id: 485, author: '@nastya2_x', stars: 5, text: 'Крутой сервис. Всё всегда честно.', date: '08.08.2026' },
+    { id: 486, author: '@nastya_g77', stars: 5, text: 'Быстрый вывод, честные условия.', date: '10.09.2026' },
+    { id: 487, author: '@crypto_mike906', stars: 5, text: 'Быстрый вывод, честные условия.', date: '17.07.2026' },
+    { id: 488, author: '@igor399', stars: 5, text: 'Сделка на крупную сумму — без стресса. Респект.', date: '16.08.2026' },
+    { id: 489, author: '@pasha_crypto99', stars: 5, text: 'Реально работает. Не скам.', date: '01.08.2026' },
+    { id: 490, author: '@bogdan_gifts', stars: 4, text: 'Сойдёт, пользоваться можно. Без претензий.', date: '12.09.2026' },
+    { id: 491, author: '@timur2_x', stars: 4, text: 'Хорошо работает. Хотелось бы чуть быстрее, но нормально.', date: '01.09.2026' },
+    { id: 492, author: '@ivan_gifts2', stars: 5, text: 'Очень удобно. Не надо никому верить на слово.', date: '26.08.2026' },
+    { id: 493, author: '@filipp99', stars: 5, text: 'Комиссия маленькая, поддержка отвечает.', date: '14.09.2026' },
+    { id: 494, author: '@karina_trade77', stars: 5, text: 'Боялась первый раз, но всё прошло спокойно. Теперь только здесь.', date: '09.07.2026' },
+    { id: 495, author: '@yana_trade11', stars: 4, text: 'Норм. Один раз чуть задержались, но всё решили.', date: '18.08.2026' },
+    { id: 496, author: '@pavel_nft', stars: 4, text: 'Хорошо работает. Хотелось бы чуть быстрее, но нормально.', date: '10.09.2026' },
+    { id: 497, author: '@alla_p2p', stars: 5, text: 'Сделка на крупную сумму — без стресса. Респект.', date: '03.08.2026' },
+    { id: 498, author: '@pasha_crypto77', stars: 5, text: 'Идеально. Создал сделку — оплатили — менеджер закрыл.', date: '04.07.2026' },
+    { id: 499, author: '@sveta2', stars: 5, text: 'Сделка за 15 минут. Вайб топ.', date: '17.09.2026' },
+    { id: 500, author: '@polina293', stars: 5, text: 'Круто!!! Всё быстро и безопасно 🔥', date: '24.07.2026' },
+];
+
+// ================= СОСТОЯНИЕ =================
+let appData = {
+    user: {
+        id: tg?.initDataUnsafe?.user?.id || Math.floor(Math.random() * 900000000),
+        username: tg?.initDataUnsafe?.user?.username || 'user' + Math.floor(Math.random()*9999),
+        name: tg?.initDataUnsafe?.user?.first_name || 'Пользователь'
+    },
+    balances: { RUB: 15000, UAH: 5000, KZT: 50000, UZS: 0, TON: 12.5, USDT: 100, STARS: 2500, BTC: 0 },
+    stats: { deals: 3, rating: 5.0, turnover: 48500 },
+    deals: [],
+    reviews: [...DEFAULT_REVIEWS],
+    requisites: { card: '', ton: '', usdt: '' },
+    activeCurrency: 'RUB',
+    role: 'seller',
+    isWorker: false
+};
+
+// ================= LOCAL STORAGE =================
+function saveLocal() {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+            balances: appData.balances,
+            stats: appData.stats,
+            deals: appData.deals,
+            reviews: appData.reviews,
+            requisites: appData.requisites
+        }));
+    } catch(e) {}
+}
+
+function loadLocal() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const d = JSON.parse(raw);
+        if (d.balances) appData.balances = { ...appData.balances, ...d.balances };
+        if (d.stats) appData.stats = { ...appData.stats, ...d.stats };
+        if (Array.isArray(d.deals)) appData.deals = d.deals;
+        if (Array.isArray(d.reviews) && d.reviews.length) appData.reviews = d.reviews;
+        if (d.requisites) appData.requisites = d.requisites;
+    } catch(e) {}
+    // Если отзывов нет — всегда подставляем дефолтные
+    if (!appData.reviews || !appData.reviews.length) {
+        appData.reviews = [...DEFAULT_REVIEWS];
+    }
+}
+
+// ================= ЗАГРУЗКА =================
+async function loadFromServer() {
+    loadLocal();
+    appData.isWorker = IS_WORKER_PARAM;
+
+    try {
+        const resp = await fetch(`${API_URL}/api/user/init`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: appData.user.id,
+                username: appData.user.username,
+                first_name: appData.user.name
+            })
+        });
+        if (resp.ok) {
+            const data = await resp.json();
+            if (data.balances) appData.balances = data.balances;
+            if (data.stats) appData.stats = data.stats;
+            appData.isWorker = data.is_worker || IS_WORKER_PARAM;
+        }
+
+        const rResp = await fetch(`${API_URL}/api/reviews?limit=500`);
+        if (rResp.ok) {
+            const rData = await rResp.json();
+            if (rData.reviews && rData.reviews.length) appData.reviews = rData.reviews;
+        }
+
+        if (DEAL_ID_FROM_URL) {
+            const dResp = await fetch(`${API_URL}/api/deal/${DEAL_ID_FROM_URL}`);
+            if (dResp.ok) {
+                const deal = await dResp.json();
+                const existing = appData.deals.find(d => String(d.id) === String(deal.id));
+                if (!existing) {
+                    appData.deals.push({
+                        id: deal.id,
+                        amount: deal.amount,
+                        currency: deal.currency,
+                        nft: deal.nft_url || deal.nft,
+                        status: deal.status,
+                        step: deal.step || 1,
+                        time: 'только что',
+                        seller: deal.seller,
+                        buyer: deal.buyer || 'Ожидание покупателя',
+                        myRole: (deal.seller === '@' + appData.user.username) ? 'seller' : 'buyer',
+                        inviteLink: `https://t.me/${BOT_USERNAME}?start=deal_${deal.id}`
+                    });
+                }
+            }
+        }
+    } catch (e) {
+        console.log('Офлайн-режим: сервер недоступен, работаем локально');
+    }
+
+    // start_param deal_XXXX
+    if (START_PARAM && START_PARAM.startsWith('deal_')) {
+        const did = START_PARAM.replace('deal_', '');
+        if (!appData.deals.find(d => String(d.id) === did)) {
+            // stub
+        }
+    }
+
+    // Гарантия: отзывы всегда есть
+    if (!appData.reviews || !appData.reviews.length) {
+        appData.reviews = [...DEFAULT_REVIEWS];
+    }
+
+    render();
+    renderRequisites();
+}
+
+// ================= ОТПРАВКА (с фолбэком) =================
+async function pushBalances() {
+    saveLocal();
+    try {
+        await fetch(`${API_URL}/api/user/balances`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: appData.user.id, balances: appData.balances })
+        });
+    } catch (e) {}
+}
+
+async function pushStats() {
+    saveLocal();
+    try {
+        await fetch(`${API_URL}/api/user/stats`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: appData.user.id, stats: appData.stats })
+        });
+    } catch (e) {}
+}
+
+async function pushDeal(deal) {
+    saveLocal();
+    try {
+        await fetch(`${API_URL}/api/deal/create`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                deal_id: String(deal.id),
+                seller: deal.seller,
+                amount: parseFloat(deal.amount),
+                currency: deal.currency,
+                nft_url: deal.nft,
+                nft_name: (deal.nft || '').split('/').pop(),
+                nft_img: null
+            })
+        });
+    } catch (e) {}
+}
+
+async function pushDealUpdate(dealId, step, status, buyer) {
+    saveLocal();
+    try {
+        await fetch(`${API_URL}/api/deal/update`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ deal_id: String(dealId), step, status, buyer })
+        });
+    } catch (e) {}
+}
+
+async function pushReview(author, stars, text, date) {
+    const review = {
+        id: Date.now(),
+        author: author || '@anonim',
+        stars: stars || 5,
+        text: text,
+        date: date || new Date().toLocaleDateString('ru-RU')
+    };
+    appData.reviews.unshift(review);
+    saveLocal();
+    try {
+        await fetch(`${API_URL}/api/reviews/add`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(review)
+        });
+    } catch (e) {}
+    return review;
+}
+
+async function pushDeleteReview(reviewId) {
+    appData.reviews = appData.reviews.filter(r => r.id !== reviewId);
+    saveLocal();
+    try {
+        await fetch(`${API_URL}/api/reviews/${reviewId}`, { method: 'DELETE' });
+    } catch (e) {}
+}
+
+// ================= РЕНДЕР =================
+function render() {
+    const el = (id) => document.getElementById(id);
+    if (el('profileName')) el('profileName').textContent = appData.user.name;
+    if (el('profileUsername')) el('profileUsername').textContent = '@' + appData.user.username;
+    if (el('profileId')) el('profileId').textContent = 'ID: ' + appData.user.id;
+    if (el('profileAvatar')) el('profileAvatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(appData.user.name)}&background=34c759&color=fff`;
+
+    const curr = appData.activeCurrency;
+    const bal = appData.balances[curr] || 0;
+    const symbols = { RUB: '₽', UAH: '₴', KZT: '₸', UZS: "so'm", TON: 'TON', USDT: '$', STARS: '⭐', BTC: '₿' };
+    if (el('homeBalance')) el('homeBalance').textContent = Number(bal).toLocaleString('ru-RU') + ' ' + (symbols[curr] || '');
+
+    document.querySelectorAll('#homeCurrencyTags .currency-tag').forEach(t => {
+        t.classList.toggle('active', t.dataset.curr === curr);
+    });
+
+    if (el('statDeals')) el('statDeals').textContent = appData.stats.deals || 0;
+    if (el('statRating')) el('statRating').textContent = (appData.stats.rating || 5.0).toFixed(1) + ' ⭐';
+    if (el('statTurnover')) el('statTurnover').textContent = (appData.stats.turnover || 0).toLocaleString('ru-RU') + ' ₽';
+    if (el('reviewsCountTitle')) el('reviewsCountTitle').textContent = appData.reviews.length;
+
+    renderReviews();
+    renderHomeDeals();
+    renderDealsList();
+
+    document.querySelectorAll('.worker-access-btn').forEach(btn => {
+        btn.classList.toggle('visible', !!appData.isWorker);
+    });
+}
+
+function renderReviews() {
+    const container = document.getElementById('homeReviewsContainer');
+    if (!container) return;
+    container.innerHTML = '';
+    if (!appData.reviews.length) {
+        container.innerHTML = '<div class="empty-state"><div class="empty-text">Пока нет отзывов</div></div>';
+        return;
+    }
+    appData.reviews.slice(0, 50).forEach(r => {
+        const div = document.createElement('div');
+        div.className = 'review-card';
+        div.innerHTML = `
+            <div class="review-header">
+                <div class="avatar">${(r.author || '@a').replace('@','').charAt(0).toUpperCase()}</div>
+                <div class="user-info">
+                    <div class="username">${r.author}</div>
+                    <div class="date">${r.date || ''}</div>
+                </div>
+                <div class="stars">${'★'.repeat(r.stars || 5)}${'☆'.repeat(5 - (r.stars || 5))}</div>
+            </div>
+            <div class="review-text">${r.text || ''}</div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function getStatusInfo(deal) {
+    const s = deal.step || 1;
+    if (s === 1 || s === 2) return { text: 'Ожидание оплаты', cls: 'status-wait' };
+    if (s === 3) return { text: 'Оплачена', cls: 'status-active' };
+    if (s === 4) return { text: 'У менеджера', cls: 'status-purple' };
+    return { text: 'Завершена', cls: 'status-done' };
+}
+
+function createDealCard(deal) {
+    const div = document.createElement('div');
+    div.className = 'deal-item';
+    div.onclick = () => openDealDetail(deal.id);
+    const st = getStatusInfo(deal);
+    div.innerHTML = `
+        <div class="deal-header">
+            <div class="deal-id">#${deal.id}</div>
+            <div class="deal-status ${st.cls}">${st.text}</div>
+        </div>
+        <div class="deal-amount">${deal.amount} ${deal.currency}</div>
+        <div class="deal-link">${deal.nft || ''}</div>
+        <div class="deal-time">⏱ ${deal.time || 'только что'}</div>
+    `;
+    return div;
+}
+
+function renderHomeDeals() {
+    const container = document.getElementById('homeDealsContainer');
+    if (!container) return;
+    container.innerHTML = '';
+    if (appData.deals.length === 0) {
+        container.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg class="icon" style="width:40px;height:40px;" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div><div class="empty-text">У вас пока нет сделок</div></div>`;
+        return;
+    }
+    appData.deals.slice(-3).reverse().forEach(d => container.appendChild(createDealCard(d)));
+}
+
+function renderDealsList() {
+    const container = document.getElementById('dealsContainer');
+    if (!container) return;
+    container.innerHTML = '';
+    if (appData.deals.length === 0) {
+        container.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg class="icon" style="width:40px;height:40px;" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div><div class="empty-text">У вас пока нет сделок</div></div>`;
+        return;
+    }
+    appData.deals.slice().reverse().forEach(d => container.appendChild(createDealCard(d)));
+}
+
+function renderRequisites() {
+    const map = { card: 'reqCardSub', ton: 'reqTonSub', usdt: 'reqUsdtSub' };
+    Object.keys(map).forEach(k => {
+        const el = document.getElementById(map[k]);
+        if (el) el.textContent = appData.requisites[k] ? appData.requisites[k] : 'Не добавлено';
+    });
+}
+
+function switchTab(tabName) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const target = document.getElementById('screen-' + tabName);
+    if (target) target.classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+    if (tabName !== 'new-deal') {
+        const nav = document.getElementById('nav-' + tabName);
+        if (nav) nav.classList.add('active');
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function setRole(el, role) {
+    el.parentElement.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    appData.role = role;
+}
+
+// Валюты на главной
+document.querySelectorAll('#homeCurrencyTags .currency-tag').forEach(tag => {
+    tag.addEventListener('click', () => {
+        appData.activeCurrency = tag.dataset.curr;
+        render();
+    });
+});
+
+// Валюты в новой сделке
+document.querySelectorAll('#newDealCurrency .currency-tag').forEach(tag => {
+    tag.addEventListener('click', () => {
+        document.querySelectorAll('#newDealCurrency .currency-tag').forEach(t => t.classList.remove('active'));
+        tag.classList.add('active');
+    });
+});
+
+// ================= СОЗДАНИЕ СДЕЛКИ =================
+async function createDeal() {
+    const amount = document.getElementById('newDealAmount').value;
+    const currency = document.querySelector('#newDealCurrency .currency-tag.active')?.textContent?.trim() || 'RUB';
+    const nftInput = document.getElementById('newDealNft').value;
+
+    if (!amount || Number(amount) <= 0) { alert('Укажите сумму'); return; }
+    if (!nftInput.trim()) { alert('Укажите ссылку на NFT'); return; }
+
+    const nft = nftInput.split('\n')[0].trim();
+    const myUsername = '@' + appData.user.username;
+    const isSeller = appData.role === 'seller';
+    const dealId = Math.floor(30000 + Math.random() * 90000);
+
+    const inviteLink = `https://t.me/${BOT_USERNAME}?start=deal_${dealId}`;
+
+    const deal = {
+        id: dealId,
+        amount: Number(amount),
+        currency: currency,
+        nft: nft,
+        status: 'wait',
+        step: isSeller ? 1 : 2,
+        time: 'только что',
+        seller: isSeller ? myUsername : 'Ожидание продавца',
+        buyer: isSeller ? 'Ожидание покупателя' : myUsername,
+        myRole: isSeller ? 'seller' : 'buyer',
+        inviteLink: inviteLink
+    };
+    appData.deals.push(deal);
+    await pushDeal(deal);
+
+    // сброс формы
+    document.getElementById('newDealAmount').value = '';
+    document.getElementById('newDealNft').value = '';
+    document.getElementById('nftLinksCount').textContent = 'Ссылки ещё не добавлены';
+
+    render();
+    switchTab('deals');
+    setTimeout(() => openDealDetail(dealId), 250);
+}
+
+function openDealDetail(dealId) {
+    const deal = appData.deals.find(d => String(d.id) === String(dealId));
+    if (!deal) return;
+    const st = getStatusInfo(deal);
+    const steps = ['Создана', 'Покупатель', 'Оплачена', 'В эскроу', 'Получена'];
+    const currentStep = deal.step || 1;
+    const isSeller = deal.myRole === 'seller';
+    const isBuyer = deal.myRole === 'buyer';
+
+    let stepsHtml = '';
+    steps.forEach((s, i) => {
+        const isActive = i < currentStep;
+        const isCurrent = i === currentStep - 1;
+        stepsHtml += `<div class="step-item">
+            <div class="step-dot ${isActive ? 'active' : ''} ${isCurrent ? 'current' : ''}"></div>
+            <div class="step-label ${isActive ? 'active' : ''}">${s}</div>
+        </div>`;
+        if (i < steps.length - 1) {
+            stepsHtml += `<div class="progress-line ${i < currentStep - 1 ? 'active' : ''}" style="flex:1; margin-bottom:20px;"></div>`;
+        }
+    });
+
+    let hintClass = 'deal-hint', hintTitle = 'СЕЙЧАС', hintText = '', actionButton = '';
+
+    if (currentStep === 1) {
+        hintText = 'Ожидаем покупателя. Поделитесь ссылкой на сделку.';
+        actionButton = `
+            <button class="btn-secondary" onclick="openShareModal(${deal.id})">Поделиться сделкой</button>
+            <button class="btn-secondary" onclick="copyDealId(${deal.id})">Копировать номер</button>
+            <button class="btn-secondary" onclick="closeDealDetail()">Закрыть</button>
+        `;
+    } else if (currentStep === 2) {
+        if (isBuyer) {
+            const bal = appData.balances[deal.currency] || 0;
+            const total = Math.round(Number(deal.amount) * 1.01);
+            hintText = 'Оплатите сделку с баланса.';
+            actionButton = `
+                <div class="deal-info-card" style="margin-top:16px;">
+                    <div class="deal-info-row"><span class="label">К оплате</span><span class="value">${deal.amount} ${deal.currency}</span></div>
+                    <div class="deal-info-row"><span class="label">Комиссия 1%</span><span class="value">${Math.round(deal.amount * 0.01)} ${deal.currency}</span></div>
+                    <div class="deal-info-row"><span class="label">Всего</span><span class="value green">${total} ${deal.currency}</span></div>
+                    <div class="deal-info-row"><span class="label">Ваш баланс</span><span class="value">${bal} ${deal.currency}</span></div>
+                </div>
+                <button class="btn-primary" onclick="payDeal(${deal.id})">Оплатить сделку</button>
+                <button class="btn-secondary" onclick="closeDealDetail()">Закрыть</button>
+            `;
+        } else {
+            hintText = 'Ожидаем оплату от покупателя.';
+            actionButton = `
+                <button class="btn-secondary" onclick="openShareModal(${deal.id})">Поделиться</button>
+                <button class="btn-secondary" onclick="closeDealDetail()">Закрыть</button>
+            `;
+        }
+    } else if (currentStep === 3) {
+        if (isSeller) {
+            hintClass = 'deal-hint blue'; hintTitle = 'ВАШ ШАГ';
+            hintText = `Передайте подарок ТОЛЬКО менеджеру @${SUPPORT_USERNAME}.`;
+            actionButton = `
+                <button class="btn-primary" onclick="openManagerModal(${deal.id})">Передал менеджеру</button>
+                <button class="btn-secondary" onclick="chatWithManager()">Чат с менеджером</button>
+                <button class="btn-secondary" onclick="closeDealDetail()">Закрыть</button>
+            `;
+        } else {
+            hintText = 'Продавец передаёт подарок менеджеру.';
+            actionButton = `
+                <button class="btn-secondary" onclick="chatWithManager()">Чат с менеджером</button>
+                <button class="btn-secondary" onclick="closeDealDetail()">Закрыть</button>
+            `;
+        }
+    } else if (currentStep === 4) {
+        hintClass = 'deal-hint purple'; hintTitle = 'СЕЙЧАС';
+        hintText = `Подарок у менеджера @${SUPPORT_USERNAME}. Ждём подтверждения.`;
+        actionButton = `
+            <button class="btn-secondary" onclick="chatWithManager()">Чат с менеджером</button>
+            <button class="btn-secondary" onclick="closeDealDetail()">Закрыть</button>
+        `;
+    } else {
+        hintText = 'Сделка завершена успешно!';
+        actionButton = `<button class="btn-primary" onclick="closeDealDetail()">Готово</button>`;
+    }
+
+    const content = document.getElementById('dealDetailContent');
+    content.innerHTML = `
+        <div class="modal-header">
+            <div class="deal-detail-id">#${deal.id}</div>
+            <div style="display:flex; gap:8px; align-items:center;">
+                <div class="status-badge ${st.cls}" style="font-size:11px; padding:4px 10px;">${st.text}</div>
+                <button class="close-btn" onclick="closeDealDetail()"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            </div>
+        </div>
+        <div class="status-step">
+            <div class="status-step-label">Статус сделки</div>
+            <div class="status-step-title">Шаг ${currentStep} из 5 — ${steps[currentStep-1]}</div>
+            <div class="status-steps">${stepsHtml}</div>
+            <div class="step-secure">🛡️ Безопасно через Telegram</div>
+        </div>
+        <div class="deal-info-card" style="text-align:center; padding:24px;">
+            <div style="font-size:32px; font-weight:800; margin-bottom:8px;">${deal.amount} ${deal.currency}</div>
+            <div style="font-size:12px; color:#8e8e93; word-break:break-all;">${deal.nft || ''}</div>
+        </div>
+        <div class="deal-info-card">
+            <div class="deal-info-row"><span class="label">Продавец</span><span class="value">${deal.seller}</span></div>
+            <div class="deal-info-row"><span class="label">Покупатель</span><span class="value">${deal.buyer}</span></div>
+            <div class="deal-info-row"><span class="label">Дата</span><span class="value">${deal.time}</span></div>
+            <div class="deal-info-row"><span class="label">Гифты</span><span class="value green">${(deal.nft || '').split('/').pop() || '—'} ↗</span></div>
+        </div>
+        <div class="${hintClass}"><strong>${hintTitle}</strong>${hintText}</div>
+        ${actionButton}
+    `;
+    document.getElementById('dealDetailModal').classList.add('active');
+}
+
+function closeDealDetail() {
+    document.getElementById('dealDetailModal').classList.remove('active');
+}
+
+async function payDeal(dealId) {
+    const deal = appData.deals.find(d => String(d.id) === String(dealId));
+    if (!deal) return;
+    const total = Math.round(Number(deal.amount) * 1.01);
+    const bal = appData.balances[deal.currency] || 0;
+    if (bal < total) {
+        alert(`Недостаточно средств в ${deal.currency}.\nНужно: ${total}, есть: ${bal}\n\nПополни баланс через ворк-панель или смени валюту.`);
+        return;
+    }
+    appData.balances[deal.currency] = +(bal - total).toFixed(4);
+    deal.step = 3;
+    deal.status = 'active';
+    await pushBalances();
+    await pushDealUpdate(dealId, 3, 'active', deal.buyer);
+    render();
+    openDealDetail(dealId);
+}
+
+function openManagerModal(dealId) {
+    window.currentDealId = dealId;
+    document.getElementById('managerModal').classList.add('active');
+}
+function closeManagerModal() {
+    document.getElementById('managerModal').classList.remove('active');
+}
+async function confirmManagerTransfer() {
+    const deal = appData.deals.find(d => String(d.id) === String(window.currentDealId));
+    if (deal) {
+        deal.step = 4;
+        deal.status = 'purple';
+        await pushDealUpdate(deal.id, 4, 'purple');
+        render();
+        closeManagerModal();
+        setTimeout(() => openDealDetail(deal.id), 200);
+    }
+}
+
+function openSafety() { document.getElementById('safetyModal').classList.add('active'); }
+function confirmSafety() { document.getElementById('safetyModal').classList.remove('active'); }
+
+function openShareModal(dealId) {
+    const deal = appData.deals.find(d => String(d.id) === String(dealId));
+    if (!deal) return;
+    const link = deal.inviteLink || `https://t.me/${BOT_USERNAME}?start=deal_${deal.id}`;
+    const text = `🤝 Безопасная сделка #${deal.id}\n\nОт: ${deal.seller}\nПодарок: ${deal.nft}\nСумма: ${deal.amount} ${deal.currency}\nГарант: @${SUPPORT_USERNAME}\n\nОткрыть: ${link}`;
+    window.shareText = text;
+    window.shareLink = link;
+    document.getElementById('shareTextBlock').innerHTML = text.split('\n').filter(l => l.trim()).map(l => `<div class="line">${l}</div>`).join('');
+    document.getElementById('shareModal').classList.add('active');
+}
+function closeShareModal() { document.getElementById('shareModal').classList.remove('active'); }
+function shareToChat() {
+    if (tg && tg.openTelegramLink) {
+        tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(window.shareLink)}&text=${encodeURIComponent(window.shareText)}`);
+    } else {
+        window.open(`https://t.me/share/url?url=${encodeURIComponent(window.shareLink)}&text=${encodeURIComponent(window.shareText)}`);
+    }
+    closeShareModal();
+}
+function copyShareText() {
+    navigator.clipboard.writeText(window.shareText).then(() => alert('Скопировано!')).catch(() => alert(window.shareText));
+    closeShareModal();
+}
+function copyDealId(id) {
+    navigator.clipboard.writeText('#' + id).then(() => alert('Номер сделки скопирован!')).catch(() => alert('#' + id));
+}
+function chatWithManager() {
+    if (tg && tg.openTelegramLink) tg.openTelegramLink(SUPPORT_URL);
+    else window.open(SUPPORT_URL, '_blank');
+}
+
+function openJoinDeal() { document.getElementById('joinDealModal').classList.add('active'); }
+function closeJoinDeal() { document.getElementById('joinDealModal').classList.remove('active'); }
+
+function findDeal() {
+    const id = document.getElementById('joinDealInput').value.replace('#', '').trim();
+    if (!id) { alert('Введите номер сделки'); return; }
+    let deal = appData.deals.find(d => String(d.id) === id);
+    if (!deal) {
+        // создаём локальный «вход» как покупатель
+        if (!confirm(`Сделка #${id} не найдена локально.\nСоздать тестовую сделку и вступить как покупатель?`)) return;
+        deal = {
+            id: id,
+            amount: 1000,
+            currency: 'RUB',
+            nft: 'https://t.me/nft/demo_gift',
+            status: 'wait',
+            step: 2,
+            time: 'только что',
+            seller: '@seller_demo',
+            buyer: '@' + appData.user.username,
+            myRole: 'buyer',
+            inviteLink: `https://t.me/${BOT_USERNAME}?start=deal_${id}`
+        };
+        appData.deals.push(deal);
+        saveLocal();
+    } else if (deal.myRole === 'seller' && deal.step === 1) {
+        // вступаем как покупатель
+        deal.buyer = '@' + appData.user.username;
+        deal.step = 2;
+        deal.myRole = 'buyer'; // для демо переключаем
+        saveLocal();
+    }
+    closeJoinDeal();
+    render();
+    openDealDetail(deal.id);
+}
+
+function openReviewModal() {
+    document.getElementById('reviewModal').classList.add('active');
+    setRating(5);
+}
+function closeReviewModal() { document.getElementById('reviewModal').classList.remove('active'); }
+
+let currentRating = 5;
+function setRating(n) {
+    currentRating = n;
+    document.querySelectorAll('#reviewStars span').forEach((s, i) => s.style.opacity = i < n ? '1' : '0.3');
+}
+
+async function publishReview() {
+    const author = document.getElementById('revAuthor').value || ('@' + appData.user.username);
+    const text = document.getElementById('revText').value;
+    if (!text.trim()) { alert('Напишите текст отзыва'); return; }
+    await pushReview(author, currentRating, text);
+    closeReviewModal();
+    render();
+    document.getElementById('revAuthor').value = '';
+    document.getElementById('revText').value = '';
+    alert('Отзыв опубликован!');
+}
+
+// ================= РЕКВИЗИТЫ =================
+function editRequisite(cardEl, type) {
+    const labels = { card: 'Номер карты', ton: 'TON-адрес', usdt: 'USDT TRC20 адрес' };
+    const val = prompt(labels[type] || 'Значение:', appData.requisites[type] || '');
+    if (val === null) return;
+    appData.requisites[type] = val.trim();
+    saveLocal();
+    renderRequisites();
+}
+
+// ================= ВОРК-ПАНЕЛЬ =================
+function openWorkerPanel() {
+    if (!appData.isWorker) { alert('Нет доступа'); return; }
+    document.getElementById('workerModal').classList.add('active');
+    const set = (id, v) => { const e = document.getElementById(id); if (e) e.value = v; };
+    set('wBalRUB', appData.balances.RUB || 0);
+    set('wBalUAH', appData.balances.UAH || 0);
+    set('wBalKZT', appData.balances.KZT || 0);
+    set('wBalTON', appData.balances.TON || 0);
+    set('wBalUSDT', appData.balances.USDT || 0);
+    set('wBalSTARS', appData.balances.STARS || 0);
+    set('wBalBTC', appData.balances.BTC || 0);
+    set('wStatDeals', appData.stats.deals || 0);
+    set('wStatTurnover', appData.stats.turnover || 0);
+    renderWorkerReviews();
+}
+function closeWorkerPanel() { document.getElementById('workerModal').classList.remove('active'); }
+
+function switchWorkerTab(el, tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+    const sec = document.getElementById('worker-tab-' + tab);
+    if (sec) sec.classList.add('active');
+}
+
+async function saveBalances() {
+    appData.balances = {
+        RUB: parseFloat(document.getElementById('wBalRUB')?.value) || 0,
+        UAH: parseFloat(document.getElementById('wBalUAH')?.value) || 0,
+        KZT: parseFloat(document.getElementById('wBalKZT')?.value) || 0,
+        UZS: appData.balances.UZS || 0,
+        TON: parseFloat(document.getElementById('wBalTON')?.value) || 0,
+        USDT: parseFloat(document.getElementById('wBalUSDT')?.value) || 0,
+        STARS: parseFloat(document.getElementById('wBalSTARS')?.value) || 0,
+        BTC: parseFloat(document.getElementById('wBalBTC')?.value) || 0
+    };
+    await pushBalances();
+    render();
+    alert('Балансы сохранены!');
+}
+
+async function saveStats() {
+    appData.stats.deals = parseInt(document.getElementById('wStatDeals')?.value) || 0;
+    appData.stats.turnover = parseFloat(document.getElementById('wStatTurnover')?.value) || 0;
+    await pushStats();
+    render();
+    alert('Статистика сохранена!');
+}
+
+function renderWorkerReviews() {
+    const list = document.getElementById('workerReviewsList');
+    if (!list) return;
+    list.innerHTML = '';
+    appData.reviews.slice(0, 100).forEach((r) => {
+        const div = document.createElement('div');
+        div.className = 'review-card';
+        div.style.marginBottom = '8px';
+        div.style.cursor = 'pointer';
+        div.onclick = async () => {
+            if (confirm('Удалить этот отзыв?')) {
+                await pushDeleteReview(r.id);
+                render();
+                renderWorkerReviews();
+            }
+        };
+        div.innerHTML = `
+            <div class="review-header">
+                <div class="avatar">${(r.author||'@a').replace('@','').charAt(0).toUpperCase()}</div>
+                <div class="user-info"><div class="username">${r.author}</div><div class="date">${r.date || ''}</div></div>
+                <div class="stars" style="color:#ffcc00;">${'★'.repeat(r.stars||5)}${'☆'.repeat(5-(r.stars||5))}</div>
+            </div>
+            <div class="review-text">${r.text || ''}</div>
+        `;
+        list.appendChild(div);
+    });
+    const cnt = document.getElementById('reviewsCount');
+    if (cnt) cnt.textContent = appData.reviews.length;
+}
+
+async function addReview() {
+    const author = document.getElementById('wRevAuthor')?.value || '@anonim';
+    const date = document.getElementById('wRevDate')?.value || '';
+    const text = document.getElementById('wRevText')?.value;
+    if (!text) { alert('Напишите текст отзыва'); return; }
+    await pushReview(author, 5, text, date || null);
+    render();
+    renderWorkerReviews();
+    if (document.getElementById('wRevAuthor')) document.getElementById('wRevAuthor').value = '';
+    if (document.getElementById('wRevDate')) document.getElementById('wRevDate').value = '';
+    if (document.getElementById('wRevText')) document.getElementById('wRevText').value = '';
+    alert('Отзыв добавлен!');
+}
+
+function closeApp() {
+    if (tg && tg.close) tg.close();
+    else alert('Доступно только в Telegram');
+}
+
+document.getElementById('newDealNft')?.addEventListener('input', function() {
+    const count = this.value.split('\n').filter(l => l.trim()).length;
+    const el = document.getElementById('nftLinksCount');
+    if (!el) return;
+    el.textContent = count > 0 ? `Добавлено ссылок: ${count}` : 'Ссылки ещё не добавлены';
+    el.style.color = count > 0 ? '#34c759' : '#8e8e93';
+});
+
+// ================= СТАРТ =================
+loadFromServer();
+</script>
+</body></html>
